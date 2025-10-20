@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autosoft - Bitácora de Repartos</title>
+
+    <link rel="stylesheet" href="/kung-fu/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/kung-fu/css/bitacora.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+
+    <main class="main-content" id="mainContent">
+        <header class="header">
+            <h1 class="header-title">Bitácora de repartos</h1>
+        </header>
+        <div class="blob_derecha">
+            <img src="/kung-fu/src/blob_derecha.svg" alt="blob_derecha">
+        </div>
+
+        <div class="content-container">
+            <div class="tabs-icons">
+                <button class="tab-icon active" data-tab="registro" title="Registro de reparto"><i class="fas fa-clipboard"></i></button>
+                <button class="tab-icon" data-tab="activos" title="Repartos activos"><i class="fas fa-motorcycle"></i></button>
+                <button class="tab-icon" data-tab="finalizados" title="Repartos finalizados"><i class="fas fa-check-circle"></i></button>
+                <button class="tab-icon" data-tab="vistarapida" title="Vista rápida del día"><i class="fas fa-bolt"></i></button>
+            </div>
+
+            <div class="tab-content">
+                <div class="tab-pane active" id="registro">
+                    <h2 class="content-subtitle">Registro de reparto</h2>
+                    <form class="form-registro" id="formRegistro" novalidate>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nTicket">N. Ticket:</label>
+                                <input type="number" id="nTicket" placeholder="Ingrese el N. ticket">
+                                <span class="error-message" id="errorNTicket"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="montoTotal">Monto Total:</label>
+                                <input type="number" id="montoTotal" placeholder="$ costo del ticket" step="0.01" maxlength="15">
+                                <span class="error-message" id="errorMontoTotal"></span>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                             <div class="form-group">
+                                <label for="destino">Destino:</label>
+                                <select id="destino"><option value="">Seleccione</option></select>
+                                <span class="error-message" id="errorDestino"></span>
+                            </div>
+                             <div class="form-group">
+                                <label for="montoPagado">Monto Pagado:</label>
+                                <input type="number" id="montoPagado" placeholder="$ Monto entregado" step="0.01" maxlength="15">
+                                <span class="error-message" id="errorMontoPagado"></span>
+                            </div>
+                        </div>
+                         <div class="form-row">
+                             <div class="form-group">
+                                <label for="vendedor">Vendedor:</label>
+                                <select id="vendedor"><option value="">Seleccione</option></select>
+                                <span class="error-message" id="errorVendedor"></span>
+                            </div>
+                             <div class="form-group">
+                                <label for="cambioDevolver">Cambio a Devolver:</label>
+                                <input type="text" id="cambioDevolver" readonly>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="repartidor">Repartidor:</label>
+                                <select id="repartidor"><option value="">Seleccione</option></select>
+                                <span class="error-message" id="errorRepartidor"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="metodoPago">Método de pago:</label>
+                                <select id="metodoPago"><option value="">Seleccione</option></select>
+                                <span class="error-message" id="errorMetodoPago"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Hora de salida:</label>
+                            <span id="horaSalidaReloj">--:--</span>
+                        </div>
+                        <div class="form-buttons">
+                            <button type="submit" class="btn btn-guardar">Guardar</button>
+                            <button type="button" class="btn btn-cancelar">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="tab-pane" id="activos">
+                    <h2 class="content-subtitle">Repartos en curso</h2>
+                    <div class="table-container">
+                        <table class="table-repartos">
+                            <thead id="tablaActivosHeader"><tr><th>Ticket</th><th>Destino</th><th>Repartidor</th><th>Vendedor</th><th>Hora salida</th><th>Acciones</th></tr></thead>
+                            <tbody id="tablaActivos"></tbody>
+                        </table>
+                    </div>
+                    <div id="emptyActivos" class="empty-message" style="display:none;"><p>No hay repartos activos</p></div>
+                </div>
+
+                <div class="tab-pane" id="finalizados">
+                    <h2 class="content-subtitle">Repartos Finalizados</h2>
+                    <div class="table-container">
+                        <table class="table-repartos">
+                            <thead><tr><th>Ticket</th><th>Destino</th><th>Repartidor</th><th>Vendedor</th><th>Hora salida</th><th>Hora llegada</th></tr></thead>
+                            <tbody id="tablaFinalizados"></tbody>
+                        </table>
+                    </div>
+                    <div id="emptyFinalizados" class="empty-message" style="display:none;"><p>No hay repartos finalizados</p></div>
+                </div>
+
+                <div class="tab-pane" id="vistarapida">
+                     <h2 class="content-subtitle">Vista Rápida del Día</h2>
+                     <div class="kpi-container">
+                         <div class="kpi-card"><span class="kpi-value" id="kpiTotalRepartos">0</span><span class="kpi-label">Repartos Totales</span></div>
+                         <div class="kpi-card"><span class="kpi-value" id="kpiRepartosActivos">0</span><span class="kpi-label">En Curso</span></div>
+                         <div class="kpi-card"><span class="kpi-value" id="kpiTotalRecaudado">$0.00</span><span class="kpi-label">Total Recaudado</span></div>
+                     </div>
+                     <div id="vistaRapidaContainer"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/kung-fu/js/main.js" defer></script>
+    <script type="module" src="/kung-fu/js/bitacora.js" defer></script>
+</body>
+</html>

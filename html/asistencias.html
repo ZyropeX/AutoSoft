@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autosoft - Registro de Asistencias</title>
+
+    <link rel="stylesheet" href="/kung-fu/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/kung-fu/css/asistencias.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    
+    <div id="sidebar-container"></div>
+
+    <main class="main-content" id="mainContent">
+        <header class="header">
+            <h1 class="header-title">Registro de Asistencias</h1>
+        </header>
+        <div class="blob_derecha">
+            <img src="/kung-fu/src/blob_derecha.svg" alt="blob_derecha">
+        </div>
+
+        <div class="content-container">
+            <div class="summary-cards-grid">
+                <div class="summary-card card-present">
+                    <div class="card-number" id="presentCount">0</div>
+                    <div class="card-label">Presentes</div>
+                </div>
+                <div class="summary-card card-late">
+                    <div class="card-number" id="lateCount">0</div>
+                    <div class="card-label">Tardanzas</div>
+                </div>
+                <div class="summary-card card-absent">
+                    <div class="card-number" id="absentCount">0</div>
+                    <div class="card-label">Ausentes</div>
+                </div>
+                <div class="summary-card card-total">
+                    <div class="card-number" id="totalCount">0</div>
+                    <div class="card-label">Total empleados</div>
+                </div>
+            </div>
+
+            <div class="current-date" id="currentDate">-- - -- - ----</div>
+
+            <div class="tab-content">
+                <div class="table-container">
+                    <table class="table-repartos">
+                        <thead>
+                            <tr>
+                            <th>Nombre</th>
+                            <th>Hora de entrada</th>
+                            <th>Hora de salida</th>
+                            <th>Estado</th>
+                            <th id="actions-header" style="display: none;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="emptyAttendance" class="empty-message" style="display:none;">
+                    <p>No hay registros de asistencia para mostrar</p>
+                </div>
+            </div>
+
+            <div id="edit-attendance-form" class="edit-form-container" style="display: none;">
+                <h2 class="edit-form-title">Editar asistencia</h2>
+                <form id="editForm">
+                    <input type="hidden" id="edit-employee-id">
+
+                    <div class="form-group">
+                        <label for="edit-employee-name">Empleado:</label>
+                        <input type="text" id="edit-employee-name" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-entry-time">Hora de entrada:</label>
+                        <input type="time" id="edit-entry-time">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-exit-time">Hora de salida:</label>
+                        <input type="time" id="edit-exit-time">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado:</label>
+                        <p id="edit-status-display" class="status-display">Presente</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-observation">Observacion:</label>
+                        <textarea id="edit-observation" rows="3" placeholder="Ej: Justificante médico por cita..."></textarea>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit" class="btn-save">Guardar</button>
+                        <button type="button" id="btn-cancel-edit" class="btn-cancel">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="/kung-fu/js/main.js" defer></script>
+    <script src="/kung-fu/js/apiService.js" defer></script>
+    <script type="module" src="/kung-fu/js/asistencias.js" defer></script>
+</body>
+</html>

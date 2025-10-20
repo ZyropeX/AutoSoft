@@ -1,0 +1,179 @@
+/* ======================================================
+   CSS FINAL Y UNIFICADO - SISTEMA AUTOSOFT
+   ====================================================== */
+
+/* ---------- IMPORTACIÓN DE FUENTES Y RESETEO ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-red: #d90429;
+    --bg-gray: #f5f5f5;
+    --white: #ffffff;
+    --dark-text: #2b2b2b;
+    --sidebar-width-expanded: 250px;
+    --sidebar-width-collapsed: 70px; /* Ancho de la barra de íconos */
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-gray);
+    color: var(--dark-text);
+    overflow-x: hidden;
+}
+
+/* ======================================================
+   SIDEBAR (BARRA LATERAL)
+   ====================================================== */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    background-color: var(--primary-red);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 0;
+    gap: 16px;
+    transition: width 0.3s ease;
+}
+
+.sidebar-btn {
+    width: 45px;
+    height: 45px;
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, width 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.sidebar-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-btn.active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-btn-add {
+    background-color: rgba(0, 0, 0, 0.2);
+    font-size: 24px;
+    margin-top: 10px;
+}
+
+.spacer {
+    flex-grow: 1;
+}
+
+/* --- ESTILOS DE EXPANSIÓN Y COLAPSO --- */
+.sidebar.collapsed {
+    width: var(--sidebar-width-collapsed);
+}
+
+.sidebar:not(.collapsed) {
+    width: var(--sidebar-width-expanded);
+    align-items: flex-start; /* Alinea los botones a la izquierda */
+}
+
+.sidebar:not(.collapsed) .sidebar-btn {
+    width: 90%;
+    margin: 0 5%;
+    justify-content: flex-start; /* Alinea ícono y texto a la izquierda */
+    padding: 0 15px;
+    gap: 15px;
+}
+
+/* Muestra el texto del 'title' cuando la barra no está colapsada */
+.sidebar:not(.collapsed) .sidebar-btn::after {
+    content: attr(title);
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Oculta el texto para el botón de menú */
+.sidebar:not(.collapsed) .sidebar-btn#sidebar-toggle::after {
+    content: "";
+}
+
+/* ======================================================
+   CONTENIDO PRINCIPAL (VERSIÓN CORREGIDA FINAL)
+   ====================================================== */
+.main-content {
+    min-height: 100vh;
+    padding: 0;
+    transition: margin-left 0.3s ease;
+    
+    /* ESTADO POR DEFECTO: El margen corresponde a la barra CERRADA */
+    margin-left: var(--sidebar-width-collapsed); 
+}
+
+/* ESTADO EXPANDIDO: El margen corresponde a la barra ABIERTA */
+.main-content.expanded {
+    margin-left: var(--sidebar-width-expanded);
+}
+
+/* ESTADO EXPANDIDO: El margen corresponde a la barra ABIERTA */
+.main-content.expanded {
+    margin-left: var(--sidebar-width-expanded);
+}
+
+.header {
+    position: relative;
+    background: none;
+    padding: 52px 32px 60px 32px;
+}
+.header-title {
+    position: relative;
+    z-index: 2;
+    color: var(--primary-red);
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+.content-container {
+    max-width: 1300px;
+    margin: -40px auto 50px;
+    padding: 0 40px;
+    position: relative;
+    z-index: 2;
+}
+
+/* ... (Tus otros estilos como blob_derecha, box, etc. van aquí sin cambios) ... */
+.blob_derecha {
+    position: fixed;
+    top: -100px;
+    right: 321px;
+    width: 180px;
+    height: 180px;
+    z-index: 1;
+    pointer-events: none;
+}
+.blob_derecha img {
+    width: 500px;
+    height: 500px;
+    object-fit: contain;
+    opacity: 0.85;
+}
+.box {
+    position: fixed;
+    top: 0;
+    height: 20px;
+    background-color: var(--primary-red);
+    z-index: 500;
+    transition: all 0.3s ease;
+}

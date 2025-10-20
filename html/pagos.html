@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autosoft - Gestión de Pago</title>
+
+    <link rel="stylesheet" href="/kung-fu/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/kung-fu/css/pagos.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+
+    <main class="main-content" id="mainContent">
+        <header class="header">
+            <h1 class="header-title">Gestión de Pago</h1>
+        </header>
+        <div class="blob_derecha">
+            <img src="/kung-fu/src/blob_derecha.svg" alt="blob_derecha">
+        </div>
+
+        <div class="content-container">
+            
+            <div class="pago-nav">
+                <button class="nav-button active" data-section="configuracion">
+                    Configuración
+                </button>
+                <button class="nav-button" data-section="reporte">
+                    Reporte
+                </button>
+            </div>
+
+            <div class="pago-content">
+                
+                <div id="section-configuracion" class="pago-section active">
+                    <div class="card">
+                        <h2 class="card-title">Sueldos Base y Tarifas</h2>
+                        <div class="config-row">
+                            <div class="config-item">
+                                <label for="sueldoBaseInput">Sueldo Base (Quincenal):</label>
+                                <input type="number" id="sueldoBaseInput" class="config-value-input" step="0.01">
+                            </div>
+                            <div class="config-item">
+                                <label for="tarifaViajeInput">Tarifa por Viaje:</label>
+                                <input type="number" id="tarifaViajeInput" class="config-value-input" step="0.01">
+                            </div>
+                            <div class="config-item">
+                                <label for="costoFaltaInput">Costo por Falta:</label>
+                                <input type="number" id="costoFaltaInput" class="config-value-input" step="0.01">
+                            </div>
+                            <button id="btnGuardarConfig" class="btn-primary">Guardar Configuración Global</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="section-reporte" class="pago-section">
+                    <div class="card">
+                        <h2 class="card-title">1. Generar Reporte Quincenal</h2>
+                        <div class="date-group">
+                            <label for="fechaInicio">Fecha de inicio:</label>
+                            <input type="date" id="fechaInicio" class="date-input">
+                        </div>
+                        <div class="date-group">
+                            <label for="fechaFin">Fecha de fin:</label>
+                            <input type="date" id="fechaFin" class="date-input">
+                        </div>
+                        <button id="btnGenerarCalculo" class="btn-primary">Generar Cálculo Quincenal</button>
+                    </div>
+
+                    <div class="card">
+                        <h2 id="resultadoTitulo" class="card-title">2. Resultado de Pagos</h2>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>REPARTIDOR</th>
+                                        <th>SUELDO BASE</th>
+                                        <th>VIAJES HECHOS</th>
+                                        <th>SUELDO POR VIAJES</th>
+                                        <th>TOTAL BRUTO</th>
+                                        <th>DESC. FALTAS</th>
+                                        <th>TOTAL NETO</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaPagos"></tbody>
+                            </table>
+                        </div>
+                        <div class="action-buttons">
+                            <button id="btnGuardarReporte" class="btn-action btn-save">Guardar Reporte</button>
+                            <button id="btnImprimir" class="btn-action btn-print">Imprimir</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div> 
+        </div> 
+    </main>
+
+    <script src="/kung-fu/js/main.js" defer></script>
+    <script src="/kung-fu/js/apiService.js" defer></script>
+    <script type="module" src="/kung-fu/js/pagos.js" defer></script>
+</body>
+</html>

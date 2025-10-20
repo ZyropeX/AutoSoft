@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kung Fu - Inicio de sesión</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+</head>
+<body>
+    <div class="login-container">
+        <form class="login-card" id="loginForm">
+            <div class="logo-placeholder">
+                <img src="../src/logo-kunfu.png" alt="Logo Kung Fu">
+
+            </div>
+            <h1 class="company-name">KUNG FU</h1>
+            <h2 class="company-subtitle">REFACCIONARIA</h2>
+            
+            <div class="input-group">
+                <label for="username">USUARIO:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="password">CONTRASEÑA:</label>
+                <div style="position: relative;">
+                    <input type="password" id="password" name="password" required>
+                    <button type="button" id="togglePassword" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; display: none;">
+                        <span id="eyeIcon">
+                            <img id="eyeOpen" src="../src/ojo-abierto.svg" alt="Mostrar contraseña" style="width:24px; height:24px; display:inline;">
+                            <img id="eyeClosed" src="../src/cerrar-ojo.svg" alt="Ocultar contraseña" style="width:24px; height:24px; display:none;">
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="login-button">INICIAR SESIÓN</button>
+        </form>
+        
+        
+    </div>
+
+    <div class="blob_1">
+            <img src="../src/blob_1.svg" alt="blob_1">
+    </div>
+
+    <div class="blob_2">
+        <img src="../src/blob_2.svg" alt="blob_2">
+    </div>
+
+    <div class="iPaul">
+        <img src="../src/iPaul.svg" alt="iPaul">
+
+    </div>
+    
+    <script src="../js/apiService.js"></script>
+    <script type="module" src="../js/javas.js"></script>
+</body>
+</html>

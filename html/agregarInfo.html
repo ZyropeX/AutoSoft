@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autosoft - Agregar Información</title>
+    <link rel="stylesheet" href="/kung-fu/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/kung-fu/css/agregarInfo.css">
+</head>
+<body>
+    <div id="sidebar-container"></div>
+
+    <main class="main-content" id="mainContent">
+        <div class="blob_derecha"><img src="/kung-fu/src/blob_derecha.svg" alt="blob_derecha"></div>
+        <div class="content-wrapper">
+            <h1 class="main-title">
+                Agregar Información
+                <div class="title-underline"></div>
+            </h1>
+
+            <div class="tabs-container">
+                <button class="tab-card active" data-tab="vendedores" title="Vendedores"><i class="fas fa-users"></i></button>
+                <button class="tab-card" data-tab="repartidores" title="Repartidores"><i class="fas fa-truck"></i></button>
+                <button class="tab-card" data-tab="destinos" title="Destinos"><i class="fas fa-map-marker-alt"></i></button>
+                <button class="tab-card" data-tab="metodos" title="Métodos de Pago"><i class="fas fa-credit-card"></i></button>
+            </div>
+
+            <div class="card">
+                <div id="vendedores-content" class="tab-content active">
+                    <h2 class="section-title">Vendedores</h2>
+                    <button class="btn-primary" data-action="add-vendedor"><i class="fas fa-plus"></i> Agregar Vendedor</button>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Estado</th>
+                                <th>Huella</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vendedores-table-body"></tbody>
+                    </table>
+                </div>
+
+                <div id="repartidores-content" class="tab-content">
+                    <h2 class="section-title">Repartidores</h2>
+                    <button class="btn-primary" data-action="add-repartidor"><i class="fas fa-plus"></i> Agregar Repartidor</button>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Estado</th>
+                                <th>Huella</th> <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="repartidores-table-body"></tbody>
+                    </table>
+                </div>
+
+                <div id="destinos-content" class="tab-content">
+                    <div class="header-actions">
+                        <h2 class="section-title">Destinos</h2>
+                        <button class="btn-primary" data-action="add-destino"><i class="fas fa-plus"></i> Agregar Destino</button>
+                    </div>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Buscar destino...">
+                    </div>
+                    <div class="destinations-list" id="destinations-list-container"></div>
+                </div>
+
+                <div id="metodos-content" class="tab-content">
+                    <div class="header-actions">
+                        <h2 class="section-title">Métodos de pago</h2>
+                        <button class="btn-primary" data-action="add-metodo"><i class="fas fa-plus"></i> Agregar Método</button>
+                    </div>
+                    <div class="payment-methods-list" id="payment-methods-container"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="fingerprint-modal" class="modal"></div>
+    <div id="form-modal" class="modal"></div>
+
+    <script src="/kung-fu/js/main.js" defer></script>
+    <script src="/kung-fu/js/apiService.js" defer></script>
+    <script type="module" src="/kung-fu/js/agregarInfo.js" defer></script>
+</body>
+</html>
