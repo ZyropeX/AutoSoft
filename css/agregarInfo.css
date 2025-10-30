@@ -14,7 +14,7 @@
     font-size: 36px;
     font-weight: 700;
     margin-bottom: 30px;
-    color: #000;
+    color: #ff0000;
 }
 
 .title-underline {
@@ -35,12 +35,12 @@
 .tab-card {
     width: 80px;
     height: 80px;
-    background-color: white;
+    background-color: rgb(224, 16, 16);
     border: none;
     border-radius: 16px;
     cursor: pointer;
     font-size: 32px;
-    color: #6b7280;
+    color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -574,7 +574,7 @@ input:checked + .slider:before {
 
 .form-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 12px;
     margin-top: 20px;
 }
@@ -602,6 +602,69 @@ input:checked + .slider:before {
     align-items: center;
     margin-bottom: 16px;
 }
-.header-actions .section-title{
+
+.header-actions .section-title {
     margin-bottom: 0;
+}
+
+/* ======================================================
+   CSS NUEVO (Punto 4: Modales de Alerta y Toast)
+   ====================================================== */
+
+#confirm-modal-content {
+    text-align: center;
+    max-width: 400px;
+    padding: 30px;
+}
+
+#confirm-modal-content h3 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #1f2937;
+}
+
+#confirm-modal-content p {
+    font-size: 16px;
+    color: #6b7280;
+    margin-bottom: 32px;
+    line-height: 1.6;
+}
+
+.confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+/* Botón de peligro (para eliminar) */
+.btn-danger {
+    background-color: #d90429;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-danger:hover {
+    background-color: #b8032a;
+}
+
+/* Estilo para el "Toast" de éxito */
+.success-toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #059669;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    z-index: 2000;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

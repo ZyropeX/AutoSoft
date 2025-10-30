@@ -177,3 +177,9 @@ body {
     z-index: 500;
     transition: all 0.3s ease;
 }
+
+/* Oculta los textos cuando la barra está colapsada */
+.sidebar.collapsed .sidebar-btn span {
+  display: none;
+}
+

@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autosoft - Gestión de Pago</title>
+    <title>Gestión de Pago</title>
 
     <link rel="stylesheet" href="/kung-fu/css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="/kung-fu/css/pagos.css">
-
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script> 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
@@ -44,15 +45,15 @@
                         <div class="config-row">
                             <div class="config-item">
                                 <label for="sueldoBaseInput">Sueldo Base (Quincenal):</label>
-                                <input type="number" id="sueldoBaseInput" class="config-value-input" step="0.01">
+                                <input type="number" id="sueldoBaseInput" value="0.00" inputmode="decimal" class="config-value-input" step="0.01">
                             </div>
                             <div class="config-item">
                                 <label for="tarifaViajeInput">Tarifa por Viaje:</label>
-                                <input type="number" id="tarifaViajeInput" class="config-value-input" step="0.01">
+                                <input type="number" id="tarifaViajeInput" value="0.00" inputmode="decimal" class="config-value-input" step="0.01">
                             </div>
                             <div class="config-item">
                                 <label for="costoFaltaInput">Costo por Falta:</label>
-                                <input type="number" id="costoFaltaInput" class="config-value-input" step="0.01">
+                                <input type="number" id="costoFaltaInput" value="0.00" inputmode="decimal" class="config-value-input" step="0.01">
                             </div>
                             <button id="btnGuardarConfig" class="btn-primary">Guardar Configuración Global</button>
                         </div>
@@ -76,7 +77,7 @@
                     <div class="card">
                         <h2 id="resultadoTitulo" class="card-title">2. Resultado de Pagos</h2>
                         <div class="table-container">
-                            <table>
+                            <table id="reporteTable">
                                 <thead>
                                     <tr>
                                         <th>REPARTIDOR</th>
@@ -102,8 +103,16 @@
         </div> 
     </main>
 
+    <!-- Contenedor oculto para impresión -->
+    <div id="print-container" class="print-container"></div>
+
     <script src="/kung-fu/js/main.js" defer></script>
     <script src="/kung-fu/js/apiService.js" defer></script>
     <script type="module" src="/kung-fu/js/pagos.js" defer></script>
 </body>
+
+<div class="modal" id="confirm-modal">
+    <div class="modal-content" id="confirm-modal-content"></div>
+</div>
+    
 </html>

@@ -1,8 +1,9 @@
 @font-face {
   font-family: 'Gang of Three'; 
-  src: url('../fonts/go3v2.ttf') format('truetype'); /* La ruta al archivo */
-} 
-/* --- Reseteo y Configuración Global --- */
+  src: url('../fonts/go3v2.ttf') format('truetype');
+}
+
+
 * {
     margin: 0;
     padding: 0;
@@ -21,7 +22,7 @@ body {
         #ff0000 35%,
         #000000 120%
     );
-    overflow-x: hidden; /* quita el scroll horizontal */
+    overflow-x: hidden;
     position: relative;
 }
 
@@ -33,7 +34,7 @@ body {
     align-items: center;
     padding: 20px;
     position: relative;
-    z-index: 1;
+    z-index: 2;
 }
 
 /* --- Tarjeta de Login --- */
@@ -49,15 +50,16 @@ body {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    position: relative;
+    z-index: 3;
 }
 
-/* --- Elementos Decorativos con Escalado Proporcional --- */
+/* --- Elementos Decorativos --- */
 .blob_1, .blob_2, .iPaul {
     position: absolute;
-    z-index: 0;
-    pointer-events: none; 
+    z-index: 1;
+    pointer-events: none;
 }
-
 
 .blob_1 {
     width: 12vw;
@@ -108,7 +110,6 @@ body {
     margin: -30px auto 10px;
     position: relative;
     overflow: hidden;
-    
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
@@ -120,9 +121,9 @@ body {
 }
 
 .company-name {
-  font-family: "Gang of Three", sans-serif;
-  font-weight: 400;
-  font-style: normal;
+    font-family: "Gang of Three", sans-serif;
+    font-weight: 400;
+    font-style: normal;
     margin: -25px auto 1px;
     font-size: 3.5rem;
     color: #4c4b4b;
@@ -137,10 +138,10 @@ body {
     margin-bottom: 35px;
 }
 
-
 .input-group {
     text-align: left;
     width: 100%;
+    position: relative;
 }
 
 .input-group label {
@@ -151,27 +152,36 @@ body {
     color: #464646;
 }
 
+
 .input-group input {
     width: 100%;
     padding: 10px 13px;
     margin-bottom: 25px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    background-color: #c1bfbf;
+    background-color: #ffffff; 
+    border-color: #ff000056;
     font-size: 1rem;
     transition: border-color 0.3s, box-shadow 0.3s;
+    color: #000000; 
+    cursor: text;
 }
 
 .input-group input:focus {
     outline: none;
     border-color: #A60303;
     box-shadow: 0 0 0 3px rgba(166, 3, 3, 0.2);
+    background-color: #ffffff; /* Mantener blanco al enfocar */
 }
 
-/*  Boton  Inicio de Sesión  */
+/* Contenedor de contraseña */
+.input-group > div {
+    position: relative;
+}
+
+/* Botón Inicio de Sesión */
 .login-button {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-
     width: 100%;
     padding: 12px 15px;
     border: none;
@@ -190,13 +200,42 @@ body {
     transform: translateY(-2px);
 }
 
-/* RESPONSIVE  */
+
+#togglePassword {
+    position: absolute;
+    right: 15px; 
+    top: 55px; 
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    outline: none;
+    font-size: 1.5rem;
+    color: #000;
+    transition: color 0.2s;
+    display: none;
+    z-index: 2;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#togglePassword:hover svg {
+    stroke: #c90606;
+}
+
+#eyeIcon {
+    pointer-events: none;
+
+}
+
+/* RESPONSIVE */
 @media (max-width: 768px) {
-    
     .blob_1, .blob_2, .iPaul {
         display: none;
     }
-
    
     .login-card {
         padding: 40px 25px;
@@ -211,29 +250,4 @@ body {
     .company-name {
         font-size: 2.2rem;
     }
-}
-
-#togglePassword {
-    position: absolute;
-    right: 10px;
-    margin-top: -3%;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    outline: none;
-    font-size: 1.5rem;
-    color: #000;
-    transition: color 0.2s;
-    display: none; 
-}
-
-#togglePassword:hover svg {
-    stroke: #c90606;
-}
-
-#eyeIcon {
-    pointer-events: none;
 }

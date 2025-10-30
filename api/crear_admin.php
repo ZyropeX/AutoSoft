@@ -1,13 +1,12 @@
 <?php
 
 
-require_once "config.php"; // Nos conectamos a la base de datos
-
+require_once "config.php"; 
 // --- DEFINE AQUÍ TUS DATOS ---
-$nombre_admin    = "Admin";
+$nombre_admin    = "admin";
 $apellido_admin  = "Autosoft";
 $usuario_login   = "admin";
-$contraseña_plana = "qwerty123"; // <-- ¡Esta será tu contraseña!
+$contraseña_plana = "qwerty123"; 
 $rol             = "admin";
 // -----------------------------
 

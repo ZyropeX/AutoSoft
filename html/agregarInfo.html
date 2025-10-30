@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autosoft - Agregar Información</title>
+    <title>Agregar Información</title>
     <link rel="stylesheet" href="/kung-fu/css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/kung-fu/css/agregarInfo.css">
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div id="sidebar-container"></div>
@@ -52,7 +53,8 @@
                             <tr>
                                 <th>Nombre</th>
                                 <th>Estado</th>
-                                <th>Huella</th> <th>Acciones</th>
+                                <th>Huella</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="repartidores-table-body"></tbody>
@@ -66,7 +68,7 @@
                     </div>
                     <div class="search-box">
                         <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Buscar destino...">
+                        <input type="text" id="destino-search-input" placeholder="Buscar destino...">
                     </div>
                     <div class="destinations-list" id="destinations-list-container"></div>
                 </div>
@@ -84,9 +86,13 @@
 
     <div id="fingerprint-modal" class="modal"></div>
     <div id="form-modal" class="modal"></div>
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content" id="confirm-modal-content"></div>
+    </div>
 
     <script src="/kung-fu/js/main.js" defer></script>
-    <script src="/kung-fu/js/apiService.js" defer></script>
     <script type="module" src="/kung-fu/js/agregarInfo.js" defer></script>
+    </body>
+</html>
 </body>
 </html>

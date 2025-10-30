@@ -93,11 +93,13 @@
     border-radius: 15px;
     box-shadow: 0 5px 20px var(--shadow);
     padding: 25px;
+    overflow-x: auto;
 }
 
 .table-repartos {
     width: 100%;
     border-collapse: collapse;
+    min-width: 600px;
 }
 
 .table-repartos th {
@@ -107,6 +109,7 @@
     font-size: 14px;
     color: var(--dark-text);
     border-bottom: 1px solid var(--light-gray);
+    background-color: #f8f9fa;
 }
 
 .table-repartos td {
@@ -122,7 +125,27 @@
 }
 
 .table-repartos tbody tr:hover {
-    background-color: transparent; /* Evita brillo */
+    background-color: #f8f9fa;
+}
+
+/* ======================================================
+   COLUMNA DE ACCIONES - CONTROL DE VISIBILIDAD
+   ====================================================== */
+.actions-column {
+    display: none;
+}
+
+.actions-column.show {
+    display: table-cell;
+}
+
+/* Ocultar celdas de acciones para usuarios no admin */
+.actions-cell {
+    display: none;
+}
+
+.actions-cell.show {
+    display: table-cell;
 }
 
 /* ======================================================
@@ -174,16 +197,21 @@
     background-color: #007bff;
     color: white;
     border: none;
-    padding: 6px 12px;
-    border-radius: 5px;
+    padding: 8px 16px;
+    border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
 }
 
 .btn-edit:hover {
     background-color: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
 }
 
 /* ======================================================
@@ -235,6 +263,7 @@
 .edit-form-container textarea:focus {
     border-color: var(--primary-red);
     outline: none;
+    box-shadow: 0 0 0 3px rgba(217, 4, 41, 0.1);
 }
 
 .edit-form-container input[readonly] {
@@ -253,6 +282,7 @@
     background-color: #f2f2f2;
     border-radius: 8px;
     color: var(--dark-text);
+    margin: 0;
 }
 
 .form-buttons {
@@ -278,7 +308,8 @@
     color: white;
 }
 .btn-save:hover {
-    opacity: 0.9;
+    background-color: #c00324;
+    transform: translateY(-1px);
 }
 
 .btn-cancel {
@@ -288,6 +319,7 @@
 }
 .btn-cancel:hover {
     background-color: #f8f9fa;
+    transform: translateY(-1px);
 }
 
 /* ======================================================
@@ -311,4 +343,34 @@
 .edit-form-container input[type="time"]::-webkit-calendar-picker-indicator {
     display: none;
     -webkit-appearance: none;
+}
+
+/* ======================================================
+   MENSAJE VACÍO
+   ====================================================== */
+.empty-message {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-size: 16px;
+}
+
+.empty-message p {
+    margin: 0;
+}
+
+/* ======================================================
+   ESTILOS PARA SWEETALERT2
+   ====================================================== */
+.swal2-confirm.swal2-styled {
+    background-color: var(--primary-red) !important;
+    border: none !important;
+    padding: 10px 24px !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+}
+
+.swal2-confirm.swal2-styled:hover {
+    background-color: #c00324 !important;
+    transform: translateY(-1px) !important;
 }

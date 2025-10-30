@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autosoft - Registro de Asistencias</title>
+    <title>Registro de Asistencias</title>
 
     <link rel="stylesheet" href="/kung-fu/css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -47,19 +47,21 @@
 
             <div class="current-date" id="currentDate">-- - -- - ----</div>
 
-            <div class="tab-content">
+            <!-- SECCIÓN: TABLA DE ASISTENCIAS -->
+            <div id="attendance-section" class="tab-content">
                 <div class="table-container">
                     <table class="table-repartos">
                         <thead>
                             <tr>
-                            <th>Nombre</th>
-                            <th>Hora de entrada</th>
-                            <th>Hora de salida</th>
-                            <th>Estado</th>
-                            <th id="actions-header" style="display: none;">Acciones</th>
+                                <th>Nombre</th>
+                                <th>Hora de entrada</th>
+                                <th>Hora de salida</th>
+                                <th>Estado</th>
+                                <th id="actions-header" class="actions-column">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="attendanceTableBody">
+                            <!-- Los registros se cargarán aquí dinámicamente -->
                         </tbody>
                     </table>
                 </div>
@@ -68,6 +70,7 @@
                 </div>
             </div>
 
+            <!-- SECCIÓN: FORMULARIO DE EDICIÓN -->
             <div id="edit-attendance-form" class="edit-form-container" style="display: none;">
                 <h2 class="edit-form-title">Editar asistencia</h2>
                 <form id="editForm">
@@ -90,7 +93,7 @@
                         <p id="edit-status-display" class="status-display">Presente</p>
                     </div>
                     <div class="form-group">
-                        <label for="edit-observation">Observacion:</label>
+                        <label for="edit-observation">Observación:</label>
                         <textarea id="edit-observation" rows="3" placeholder="Ej: Justificante médico por cita..."></textarea>
                     </div>
                     <div class="form-buttons">

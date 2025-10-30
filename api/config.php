@@ -1,8 +1,8 @@
 <?php
 // config.php
-$host = "localhost:3307"; // <-- Añade el nuevo puerto
+$host = "localhost:3307"; 
 $user = "root";
-$pass = ""; // O tu contraseña correcta
+$pass = ""; 
 $db   = "kungfu";
 $conn = new mysqli($host, $user, $pass, $db);
 

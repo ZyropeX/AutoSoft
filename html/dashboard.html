@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autosoft - Dashboard de Reportes</title>
+
+    <link rel="stylesheet" href="/kung-fu/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/kung-fu/css/dashboard.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+
+    <main class="main-content" id="mainContent">
+        <header class="header">
+            <h1 class="header-title">Dashboard de Reportes</h1>
+        </header>
+        <div class="blob_derecha">
+            <img src="/kung-fu/src/blob_derecha.svg" alt="blob_derecha">
+        </div>
+
+        <div class="content-container">
+            
+            <!-- Selector de Período -->
+            <div class="period-selector">
+                <div class="selector-group">
+                    <label for="mes">Mes:</label>
+                    <select id="mes">
+                        <option value="1">Enero</option>
+                        <option value="2">Febrero</option>
+                        <option value="3">Marzo</option>
+                        <option value="4">Abril</option>
+                        <option value="5">Mayo</option>
+                        <option value="6">Junio</option>
+                        <option value="7">Julio</option>
+                        <option value="8">Agosto</option>
+                        <option value="9">Septiembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                    </select>
+                </div>
+
+                <div class="selector-group">
+                    <label for="año">Año:</label>
+                    <select id="año"></select>
+                </div>
+
+                <button id="btnCargar" class="btn-cargar">
+                    <i class="fas fa-chart-line"></i> Cargar Datos
+                </button>
+            </div>
+
+            <!-- Contenedor de Gráficos -->
+            <div class="charts-container">
+                
+                <!-- Gráfico de Pastel (Repartos) -->
+                <div class="chart-card">
+                    <h2 class="chart-title">Distribución de Repartos</h2>
+                    <div class="chart-wrapper">
+                        <canvas id="chartRepartos"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Barras (Ganancias) -->
+                <div class="chart-card">
+                    <h2 class="chart-title">Ganancias por Repartidor</h2>
+                    <div class="chart-wrapper">
+                        <canvas id="chartGanancias"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Comparativa Meses -->
+            <div class="comparativa-card">
+                <h2 class="card-title">Comparativa con Mes Anterior</h2>
+                <div class="comparativa-grid">
+                    <div class="comparativa-item">
+                        <span class="comparativa-label">Total Repartos</span>
+                        <div class="comparativa-values">
+                            <span class="actual" id="comparativa-repartos-actual">-</span>
+                            <span class="anterior" id="comparativa-repartos-anterior">-</span>
+                            <span class="pct" id="comparativa-repartos-pct">-</span>
+                        </div>
+                    </div>
+
+                    <div class="comparativa-item">
+                        <span class="comparativa-label">Total Ganancias</span>
+                        <div class="comparativa-values">
+                            <span class="actual" id="comparativa-ganancias-actual">-</span>
+                            <span class="anterior" id="comparativa-ganancias-anterior">-</span>
+                            <span class="pct" id="comparativa-ganancias-pct">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla Resumen -->
+            <div class="table-card">
+                <h2 class="card-title">Detalle de Repartidores</h2>
+                <div class="table-container">
+                    <table id="tablaRepartidores">
+                        <thead>
+                            <tr>
+                                <th>Repartidor</th>
+                                <th>Repartos</th>
+                                <th>Tarifa por Viaje</th>
+                                <th>Ganancia Repartidor</th>
+                                <th>Ganancia Empresa</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaBody">
+                            <tr><td colspan="5" style="text-align:center; padding: 20px;">Selecciona mes y año para cargar datos</td></tr>
+                        </tbody>
+                        <tfoot id="tablaFooter">
+                            <tr>
+                                <td><strong>TOTAL</strong></td>
+                                <td id="total-repartos">-</td>
+                                <td id="total-tarifa">-</td>
+                                <td id="total-ganancia-repartidor">-</td>
+                                <td id="total-ganancia-empresa">-</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="/kung-fu/js/main.js" defer></script>
+    <script src="/kung-fu/js/apiService.js" defer></script>
+    <script type="module" src="/kung-fu/js/dashboard.js" defer></script>
+</body>
+
+<div class="modal" id="confirm-modal">
+    <div class="modal-content" id="confirm-modal-content"></div>
+</div>
+
+</html>

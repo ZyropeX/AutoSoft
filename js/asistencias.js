@@ -1,16 +1,16 @@
 import { api } from './apiService.js';
 
 document.addEventListener('DOMContentLoaded', function() {
-
-    // ============================================
-    // VARIABLES GLOBALES Y CONFIGURACIÓN INICIAL
-    // ============================================
+    
+    
     const userRole = localStorage.getItem('currentUserRole');
-    let attendanceData = []; // Este array ahora se llenará desde la API
+    let attendanceData = [];
+    let employeeRetardos = {};
 
-    // ============================================
-    // FUNCIÓN UTILITARIA PARA FORMATEAR HORA
-    // ============================================
+    console.log('=== PÁGINA CARGADA ===');
+    console.log('UserRole:', userRole);
+
+    // UTILIDADES
     function formatTo12Hour(timeString) {
         if (!timeString || timeString === '--:--') {
             return '--:--';
@@ -28,9 +28,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // ============================================
-    // LÓGICA DE UI
-    // ============================================
+    function calcularEstado(entryTime, employeeId) {
+        if (!entryTime || entryTime === '--:--') {
+            return 'Ausente';
+        }
+        if (entryTime <= "08:20") {
+            return 'Presente';
+        } else if (entryTime >= "08:21" && entryTime <= "08:30") {
+            if (!employeeRetardos[employeeId]) {
+                employeeRetardos[employeeId] = 0;
+            }
+            employeeRetardos[employeeId]++;
+            if (employeeRetardos[employeeId] > 3) {
+                return 'Ausente';
+            }
+            return 'Tardanza';
+        } else {
+            return 'Ausente';
+        }
+    }
+
+    // SETUP UI
     function setupUI() {
         const username = localStorage.getItem('currentUser');
         const usernameDisplay = document.getElementById('username-display');
@@ -38,37 +56,41 @@ document.addEventListener('DOMContentLoaded', function() {
             usernameDisplay.textContent = username;
         }
 
-        const actionsHeader = document.getElementById('actions-header');
-        if (userRole === 'admin' && actionsHeader) {
-            actionsHeader.style.display = 'table-cell';
-        }
-
         const pagoLink = document.getElementById('pago-link');
         if (userRole === 'admin' && pagoLink) {
             pagoLink.style.display = 'list-item';
         }
 
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
-        const menuBtn = document.getElementById('menuBtn');
-        if (menuBtn && sidebar && mainContent) {
-            menuBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('expanded');
-            });
+        if (userRole === 'admin') {
+            const actionsHeader = document.getElementById('actions-header');
+            if (actionsHeader) {
+                actionsHeader.classList.add('show');
+            }
         }
     }
 
-    // ============================================
-    // LÓGICA PRINCIPAL DE ASISTENCIAS
-    // ============================================
+    // CARGAR ASISTENCIAS
     async function cargarYRenderizarAsistencias() {
         try {
-            // Llama a la API para obtener los datos del día
             const response = await api.getAsistenciasDelDia();
-
             if (response.status === 'success') {
-                attendanceData = response.data; // Guarda los datos de la API en la variable global
+                attendanceData = response.data;
+                console.log('Datos cargados:', attendanceData);
+                if (attendanceData.length > 0) {
+                    console.log('Primer registro:', attendanceData[0]);
+                    console.log('Propiedades:', Object.keys(attendanceData[0]));
+                }
+                
+                employeeRetardos = {};
+                attendanceData.forEach(record => {
+                    if (record.status === 'Tardanza') {
+                        if (!employeeRetardos[record.employeeId]) {
+                            employeeRetardos[record.employeeId] = 0;
+                        }
+                        employeeRetardos[record.employeeId]++;
+                    }
+                });
+                
                 calculateAndRender();
             } else {
                 throw new Error(response.message);
@@ -79,31 +101,43 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // RENDERIZAR TABLA
     function renderAttendanceTable() {
         const tableBody = document.getElementById('attendanceTableBody');
         if (!tableBody) return;
+        
         tableBody.innerHTML = '';
 
-        attendanceData.forEach(record => {
+        if (attendanceData.length === 0) {
+            document.getElementById('emptyAttendance').style.display = 'block';
+            return;
+        } else {
+            document.getElementById('emptyAttendance').style.display = 'none';
+        }
+
+        attendanceData.forEach((record, index) => {
             const row = document.createElement('tr');
-            const statusIconsHTML = `
-                <div class="status-actions">
-                    <div class="status-icon status-present ${record.status === 'Presente' ? 'active' : ''}" title="Presente"><i class="fas fa-check"></i></div>
-                    <div class="status-icon status-late ${record.status === 'Tardanza' ? 'active' : ''}" title="Tardanza">L</div>
-                    <div class="status-icon status-absent ${record.status === 'Ausente' ? 'active' : ''}" title="Ausente"><i class="fas fa-times"></i></div>
-                </div>`;
             
             row.innerHTML = `
                 <td>${record.name}</td>
                 <td>${formatTo12Hour(record.entryTime)}</td>
                 <td>${formatTo12Hour(record.exitTime)}</td>
-                <td>${statusIconsHTML}</td>`;
+                <td>
+                    <div class="status-actions">
+                        <div class="status-icon status-present ${record.status === 'Presente' ? 'active' : ''}" title="Presente"><i class="fas fa-check"></i></div>
+                        <div class="status-icon status-late ${record.status === 'Tardanza' ? 'active' : ''}" title="Tardanza">L</div>
+                        <div class="status-icon status-absent ${record.status === 'Ausente' ? 'active' : ''}" title="Ausente"><i class="fas fa-times"></i></div>
+                    </div>
+                </td>
+            `;
             
             if (userRole === 'admin') {
                 const actionsCell = document.createElement('td');
-                actionsCell.innerHTML = `<button class="btn-edit" data-id="${record.id}">Editar</button>`;
+                actionsCell.classList.add('actions-cell', 'show');
+                actionsCell.innerHTML = `<button class="btn-edit" data-row-index="${index}">Editar</button>`;
                 row.appendChild(actionsCell);
             }
+            
             tableBody.appendChild(row);
         });
     }
@@ -113,6 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const lateCountEl = document.getElementById('lateCount');
         const absentCountEl = document.getElementById('absentCount');
         const totalCountEl = document.getElementById('totalCount');
+        
         if (!presentCountEl) return;
 
         const totals = {
@@ -138,9 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // ============================================
-    // MANEJO DE EVENTOS
-    // ============================================
+    // EVENT LISTENERS
     function setupEventListeners() {
         const tableBody = document.getElementById('attendanceTableBody');
         const editFormContainer = document.getElementById('edit-attendance-form');
@@ -148,73 +181,92 @@ document.addEventListener('DOMContentLoaded', function() {
         const btnCancelEdit = document.getElementById('btn-cancel-edit');
         const btnLogout = document.getElementById('btnLogout');
 
+        // Click en botón editar
         if (tableBody) {
-            tableBody.addEventListener('click', (event) => {
-                const target = event.target;
-                if (target.classList.contains('btn-edit')) {
-                    const employeeId = parseInt(target.dataset.id, 10);
-                    const employee = attendanceData.find(emp => emp.id === employeeId);
-                    if (employee) {
-                        document.getElementById('edit-employee-id').value = employee.id;
-                        document.getElementById('edit-employee-name').value = employee.name;
-                        document.getElementById('edit-entry-time').value = employee.entryTime === '--:--' ? '' : employee.entryTime;
-                        document.getElementById('edit-exit-time').value = employee.exitTime === '--:--' ? '' : employee.exitTime;
-                        document.getElementById('edit-status-display').textContent = employee.status;
-                        document.getElementById('edit-observation').value = employee.observation;
-                        editFormContainer.style.display = 'block';
-                    }
+            tableBody.addEventListener('click', function(e) {
+                const btn = e.target.closest('.btn-edit');
+                if (!btn) return;
+
+                const rowIndex = parseInt(btn.dataset.rowIndex, 10);
+                const employee = attendanceData[rowIndex];
+
+                if (employee && editFormContainer) {
+                    console.log('Abriendo formulario para:', employee.name);
+                    
+                    document.getElementById('edit-employee-id').value = employee.employeeId || rowIndex;
+                    document.getElementById('edit-employee-name').value = employee.name || '';
+                    document.getElementById('edit-entry-time').value = employee.entryTime === '--:--' ? '' : (employee.entryTime || '');
+                    document.getElementById('edit-exit-time').value = employee.exitTime === '--:--' ? '' : (employee.exitTime || '');
+                    document.getElementById('edit-status-display').textContent = employee.status || 'Presente';
+                    document.getElementById('edit-observation').value = employee.observation || '';
+                    
+                    editFormContainer.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        editFormContainer.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
                 }
             });
         }
 
+        // Submit del formulario
         if (editForm) {
-            editForm.addEventListener('submit', async (event) => { // La función ahora es async
-                event.preventDefault();
+            editForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
                 const employeeId = parseInt(document.getElementById('edit-employee-id').value, 10);
-                const employee = attendanceData.find(emp => emp.id === employeeId);
+                const employee = attendanceData.find(emp => emp.employeeId === employeeId) || attendanceData[employeeId];
 
                 if (employee) {
                     const newEntryTime = document.getElementById('edit-entry-time').value;
+                    const newExitTime = document.getElementById('edit-exit-time').value;
 
-                    // Actualiza el objeto 'employee' localmente
                     employee.entryTime = newEntryTime || "--:--";
-                    employee.exitTime = document.getElementById('edit-exit-time').value || "--:--";
+                    employee.exitTime = newExitTime || "--:--";
                     employee.observation = document.getElementById('edit-observation').value;
+                    employee.status = calcularEstado(newEntryTime, employeeId);
 
-                    // Vuelve a aplicar la lógica de estado
-                    if (newEntryTime && newEntryTime !== "--:--") {
-                        if (newEntryTime <= "08:20") employee.status = "Presente";
-                        else if (newEntryTime >= "08:21" && newEntryTime <= "08:30") employee.status = "Tardanza";
-                        else employee.status = "Ausente";
-                    } else {
-                        employee.status = "Ausente";
-                    }
+                    document.getElementById('edit-status-display').textContent = employee.status;
 
-                    // Llama a la API para guardar los datos en la base de datos
                     const fechaActual = new Date().toISOString().split('T')[0];
                     const result = await api.updateAsistencia({
-                        ...employee, // Envía todos los datos actualizados del empleado
+                        ...employee,
                         fecha: fechaActual 
                     });
 
                     if (result.status === 'success') {
-                        // Vuelve a dibujar todo para reflejar los cambios
-                        calculateAndRender(); 
+                        calculateAndRender();
                         editFormContainer.style.display = 'none';
                         Swal.fire('¡Guardado!', 'La asistencia ha sido actualizada.', 'success');
                     } else {
-                        Swal.fire('Error', 'No se pudo guardar la asistencia: ' + result.message, 'error');
+                        Swal.fire('Error', 'No se pudo guardar: ' + result.message, 'error');
                     }
                 }
             });
         }
 
+        // Cambio en hora de entrada
+        const editEntryTime = document.getElementById('edit-entry-time');
+        if (editEntryTime) {
+            editEntryTime.addEventListener('change', function() {
+                const employeeId = parseInt(document.getElementById('edit-employee-id').value, 10);
+                const newEntryTime = this.value;
+                
+                if (newEntryTime) {
+                    const nuevoEstado = calcularEstado(newEntryTime, employeeId);
+                    document.getElementById('edit-status-display').textContent = nuevoEstado;
+                }
+            });
+        }
+
+        // Botón cancelar
         if (btnCancelEdit) {
             btnCancelEdit.addEventListener('click', () => {
                 editFormContainer.style.display = 'none';
             });
         }
 
+        // Logout
         if (btnLogout) {
             btnLogout.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -238,9 +290,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // --- INICIALIZACIÓN DE LA PÁGINA ---
+    // INICIALIZAR
     setupUI();
     updateCurrentDate();
     cargarYRenderizarAsistencias();
-    setupEventListeners();
+    
+    setTimeout(() => {
+        setupEventListeners();
+    }, 500);
 });

@@ -1,26 +1,23 @@
 <?php
 
 
-require_once "config.php"; // Nos conectamos a la base de datos
+require_once "config.php"; 
 
-// --- DEFINE AQUÍ TUS DATOS ---
-$nombre_admin    = "Admin";
+$nombre_admin    = "bodega"; 
 $apellido_admin  = "Autosoft";
-$usuario_login   = "bodega";
-$contraseña_plana = "qwerty321"; // <-- ¡Esta será tu contraseña!
-$rol             = "admin";
+$usuario_login   = "bodega"; 
+$contraseña_plana = "qwerty321"; 
+$rol             = "bodega"; 
 // -----------------------------
 
-// Encriptamos la contraseña de forma segura
 $contraseña_hasheada = password_hash($contraseña_plana, PASSWORD_BCRYPT);
 
-// Preparamos la consulta para insertar el nuevo empleado
 $sql = "INSERT INTO empleado (nombre, apellido, usuario_login, contraseña, rol) VALUES (?, ?, ?, ?, ?)";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("sssss", $nombre_admin, $apellido_admin, $usuario_login, $contraseña_hasheada, $rol);
 
-// Ejecutamos y mostramos un mensaje
+
 if ($stmt->execute()) {
     echo "<h1>¡Éxito!</h1>";
     echo "<p>El usuario administrador ha sido creado correctamente.</p>";
