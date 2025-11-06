@@ -259,9 +259,7 @@ function updateMetodoPago($conn, $data) {
 }
 
 function updateMetodoStatus($conn, $data) {
-    // Log de depuración (puedes borrarlo después)
-    file_put_contents('debug_log.txt', "Recibido en updateMetodoStatus: " . json_encode($data) . "\n", FILE_APPEND);
-    // --- CAMBIO 1: Validar ID (igual que antes, como string) ---
+    
     $id = trim($data['id'] ?? '0');
     if (empty($id) || $id === '0') { 
         sendJsonResponse('error', "ID requerido", null, 400); 

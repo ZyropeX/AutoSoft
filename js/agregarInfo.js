@@ -2,7 +2,7 @@
 import { api } from './apiService.js';
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("=== PÁGINA AGREGAR INFO CARGADA ==="); // Log inicial
+    console.log("=== PÁGINA AGREGAR INFO CARGADA ==="); 
 
     
     // ========================================
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </td>
                 </tr>`,
             formFields: [
-                { id: 'nombre', label: 'Nombre completo', type: 'text', required: true }
+                { id: 'nombre', label: 'Nombre completo', type: 'text', required: true, placeholder: 'Ej. Juan Pérez' }
             ],
             emptyStateHTML: '<tr><td colspan="4" style="text-align: center;">No hay vendedores registrados.</td></tr>'
         },
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </td>
                 </tr>`,
             formFields: [
-                { id: 'nombre', label: 'Nombre completo', type: 'text', required: true }
+                { id: 'nombre', label: 'Nombre completo', type: 'text', required: true, placeholder: 'Ej. Juan Pérez' }
             ],
             emptyStateHTML: '<tr><td colspan="4" style="text-align: center;">No hay repartidores registrados.</td></tr>'
         },
@@ -78,8 +78,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>`,
             formFields: [
-                { id: 'lugar', label: 'Lugar', type: 'text', required: true },
-                { id: 'direccion', label: 'Dirección', type: 'text', required: true }
+                { id: 'lugar', label: 'Lugar', type: 'text', required: true, placeholder: 'Nombre del lugar' },
+                { id: 'direccion', label: 'Dirección', type: 'text', required: true, placeholder: 'Calle, número y colonia' }
             ],
             emptyStateHTML: '<div style="text-align: center;">No hay destinos registrados.</div>'
         },
@@ -110,13 +110,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             <input type="checkbox" ${isChecked ? 'checked' : ''}>
                             <span class="slider"></span>
                         </label>
-                        <button class="action-btn edit-btn" title="Editar"><i class="fas fa-pen"></i></button>
                         <button class="action-btn delete-btn" title="Eliminar"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
             },
             formFields: [
-                { id: 'nombre', label: 'Método de pago', type: 'text', required: true }
+                { id: 'nombre', label: 'Método de pago', type: 'text', required: true, placeholder: 'Ej. Tarjeta de Crédito' }
             ],
             emptyStateHTML: '<div style="text-align: center;">No hay métodos de pago registrados.</div>'
         }
@@ -144,14 +143,42 @@ document.addEventListener('DOMContentLoaded', function() {
     function showConfirmationModal({ title, message, confirmText = 'Confirmar', cancelText = 'Cancelar', confirmClass = 'btn-primary', showCancelButton = true }) {
         return new Promise((resolve) => {
             if (!confirmModal || !confirmModalContent) { console.error("Modal confirmación no encontrado."); resolve(false); return; }
-            confirmModalContent.innerHTML = `<h3>${title}</h3><p>${message}</p><div class="confirm-actions">${showCancelButton ? `<button type="button" class="btn btn-secondary" id="confirm-cancel-btn">${cancelText}</button>` : ''}<button type="button" class="${confirmClass === 'btn-danger' ? 'btn-danger' : confirmClass}" id="confirm-ok-btn">${confirmText}</button></div>`;
+            
+            let confirmButtonClass = 'btn-primary';
+            if (confirmClass === 'btn-danger') {
+                confirmButtonClass = 'btn-danger';
+            }
+
+            confirmModalContent.innerHTML = `
+                <h3>${title}</h3>
+                <p>${message}</p>
+                <div class="confirm-actions">
+                    ${showCancelButton ? `<button type="button" class="btn-secondary" id="confirm-cancel-btn">${cancelText}</button>` : ''}
+                    <button type="button" class="${confirmButtonClass}" id="confirm-ok-btn">${confirmText}</button>
+                </div>`;
+            
             openModal(confirmModal);
-            const okBtn = document.getElementById('confirm-ok-btn'); const cancelBtn = document.getElementById('confirm-cancel-btn');
-            const cleanUpAndResolve = (value) => { if(okBtn) okBtn.onclick = null; if(cancelBtn) cancelBtn.onclick = null; confirmModal.onclick = null; closeModal(confirmModal); resolve(value); };
-            if(okBtn) okBtn.onclick = () => cleanUpAndResolve(true); if(showCancelButton && cancelBtn) cancelBtn.onclick = () => cleanUpAndResolve(false);
-            confirmModal.onclick = (e) => { if (e.target === confirmModal && showCancelButton) cleanUpAndResolve(false); };
+            
+            const okBtn = document.getElementById('confirm-ok-btn'); 
+            const cancelBtn = document.getElementById('confirm-cancel-btn');
+            
+            const cleanUpAndResolve = (value) => { 
+                if(okBtn) okBtn.onclick = null; 
+                if(cancelBtn) cancelBtn.onclick = null; 
+                confirmModal.onclick = null; 
+                closeModal(confirmModal); 
+                resolve(value); 
+            };
+            
+            if(okBtn) okBtn.onclick = () => cleanUpAndResolve(true); 
+            if(showCancelButton && cancelBtn) cancelBtn.onclick = () => cleanUpAndResolve(false);
+            
+            confirmModal.onclick = (e) => { 
+                if (e.target === confirmModal && showCancelButton) cleanUpAndResolve(false); 
+            };
         });
     }
+    
     function showErrorModal(title, message) { return showConfirmationModal({ title: title || 'Error', message: message || 'Ocurrió un error.', confirmText: 'Entendido', confirmClass: 'btn-primary', showCancelButton: false }); }
     function showSuccessToast(message) { const toast = document.createElement('div'); toast.className = 'success-toast'; toast.textContent = message; document.body.appendChild(toast); setTimeout(() => { toast.remove(); }, 3000); }
     function getTypeKeyFromElement(element) { if (!element) return null; if (element.closest('#vendedores-table-body')) return 'vendedor'; if (element.closest('#repartidores-table-body')) return 'repartidor'; if (element.closest('#destinations-list-container')) return 'destino'; if (element.closest('#payment-methods-container')) return 'metodo'; return null; }
@@ -160,12 +187,10 @@ document.addEventListener('DOMContentLoaded', function() {
     async function renderData(typeConfig) {
         if (!typeConfig || !typeConfig.containerId) { console.error("Config inválida", typeConfig); return; }
         const container = document.getElementById(typeConfig.containerId); if (!container) { return; }
-        // console.log(`Renderizando datos para: ${typeConfig.title}`); // Descomentar para logs
         container.innerHTML = '<p style="text-align: center;">Cargando...</p>';
         try {
             if (typeof typeConfig.fetchData !== 'function') { throw new Error(`fetchData inválido para ${typeConfig.title}`); }
             const response = await typeConfig.fetchData();
-            // console.log(`Respuesta API para ${typeConfig.title}:`, response); // Descomentar para logs
             if (response && response.status === 'success') {
                 const items = response.data || [];
                 if (typeConfig.title === 'Destino') { destinosCompletos = items; filterDestinos(destinoSearchInput?.value.toLowerCase() || ''); }
@@ -180,10 +205,19 @@ document.addEventListener('DOMContentLoaded', function() {
     function openFingerprintModal(id, tipo) {
          if (!fingerprintModal) { console.error("Modal huella no existe"); showErrorModal("Error", "Modal huella no existe."); return; }
         fingerprintModal.innerHTML = `
-            <div class="modal-content"><div class="modal-header"><h2>Registrar Huella</h2><span class="close-modal-btn">&times;</span></div>
-            <div class="modal-body"><div class="fingerprint-icon"><i class="fas fa-fingerprint"></i></div><h3>Escanear Huella</h3><p>Coloque dedo</p>
-            <div class="progress-steps"><div class="step" id="step-1">1</div><div class="step" id="step-2">2</div><div class="step" id="step-3">3</div></div>
-            <p class="progress-text" id="progress-text">Esperando...</p><div class="form-actions"><button type="button" class="btn btn-secondary close-modal-btn">Cancelar</button><button type="button" class="btn btn-primary" id="btn-retry" style="display: none;">Reintentar</button></div></div></div>`;
+            <div class="modal-content">
+                <div class="modal-header"><h2>Registrar Huella</h2><span class="close-modal-btn">&times;</span></div>
+                <div class="modal-body">
+                    <div class="fingerprint-icon"><i class="fas fa-fingerprint"></i></div>
+                    <h3>Escanear Huella</h3><p>Coloque dedo</p>
+                    <div class="progress-steps"><div class="step" id="step-1">1</div><div class="step" id="step-2">2</div><div class="step" id="step-3">3</div></div>
+                    <p class="progress-text" id="progress-text">Esperando...</p>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel close-modal-btn">Cancelar</button>
+                        <button type="button" class="btn-save" id="btn-retry" style="display: none;">Reintentar</button>
+                    </div>
+                </div>
+            </div>`;
         openModal(fingerprintModal);
         captureFingerprintSequence(id, tipo);
     }
@@ -202,14 +236,110 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateFingerprintProgress(currentStep, text) { const el = document.getElementById('progress-text'); if(el) el.textContent = text; for (let i = 1; i <= 3; i++) { const step = document.getElementById(`step-${i}`); if(step) step.classList.toggle('active', i <= currentStep); } }
 
     // ========================================
-    // MODAL FORMULARIO (Agregar/Editar - Completo)
+    // MODAL FORMULARIO (Agregar/Editar - CORREGIDO)
     // ========================================
     function handleOpenFormModal(type, editId = null, existingData = null) {
         const conf = config[type]; if (!conf) { console.error(`Config no encontrada: ${type}`); return; }
         const isEditing = editId !== null; console.log(isEditing ? `Editando ${type} ID ${editId}` : `Agregando ${type}`, existingData || '');
-        formModal.innerHTML = `<div class="modal-content"><div class="modal-header"><h2>${isEditing ? 'Editar' : 'Agregar'} ${conf.title}</h2><span class="close-modal-btn">&times;</span></div><form id="generic-form" novalidate>${conf.formFields.map(f => { let valAttrs = ''; if (f.id === 'nombre') { valAttrs = ' pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$" title="Solo letras y espacios."'; } const val = isEditing && existingData ? (existingData[f.id] || '') : ''; return `<div class="form-group"><label for="${f.id}">${f.label}</label><input type="${f.type || 'text'}" id="${f.id}" name="${f.id}" ${f.required ? 'required' : ''} value="${val}"${valAttrs}></div>`; }).join('')}<div class="form-actions"><button type="submit" class="btn btn-primary">${isEditing ? 'Actualizar' : 'Guardar'}</button><button type="button" class="btn btn-secondary close-modal-btn">Cancelar</button></div></form></div>`;
-        openModal(formModal); const form = formModal.querySelector('#generic-form'); if (!form) return;
-        form.onsubmit = async function(e) { e.preventDefault(); const formData = {}; let isValid = true; conf.formFields.forEach(f => { const input = form.querySelector(`#${f.id}`); if (input) { formData[f.id] = input.value; if (!input.checkValidity()) { isValid = false; console.warn(`Inválido: ${f.id}`, input.validationMessage); } } }); if (!isValid) { showErrorModal("Inválido", "Corrige los errores."); return; } let result; const formValues = Object.values(formData); console.log("Enviando:", isEditing ? { id: editId, ...formData } : formData); const submitBtn = form.querySelector('button[type="submit"]'); try { if(submitBtn) submitBtn.disabled = true; if (isEditing) { result = await conf.updateData(editId, ...formValues); } else { result = await conf.saveData(...formValues); } if(submitBtn) submitBtn.disabled = false; console.log("Respuesta API:", result); if (result && result.status === 'success') { await renderData(conf); closeModal(formModal); showSuccessToast(`Se ${isEditing ? 'actualizó' : 'guardó'} ${conf.title}.`); } else { showErrorModal('Error al guardar', result?.message || 'Error API.'); } } catch (error) { if(submitBtn) submitBtn.disabled = false; console.error('Error form submit:', error); showErrorModal('Error conexión', error.message || 'No se pudo guardar.'); } };
+
+        const formFieldsHTML = conf.formFields.map(f => {
+            const val = isEditing && existingData ? (existingData[f.id] || '') : '';
+            const placeholder = f.placeholder || '';
+            const valAttrs = (f.id === 'nombre') ? ' pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$" title="Solo letras y espacios."' : '';
+            
+            return `
+            <div class="form-group">
+                <label for="${f.id}">${f.label}</label>
+                <input 
+                    type="${f.type || 'text'}" 
+                    id="${f.id}" 
+                    name="${f.id}" 
+                    ${f.required ? 'required' : ''} 
+                    value="${val}" 
+                    placeholder="${placeholder}"
+                    ${valAttrs}
+                >
+            </div>`;
+        }).join('');
+
+        formModal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>${isEditing ? 'Editar' : 'Agregar'} ${conf.title}</h2>
+                    <span class="close-modal-btn">&times;</span>
+                </div>
+                <form id="generic-form" novalidate>
+                    <div class="modal-body">
+                        ${formFieldsHTML}
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn-save">${isEditing ? 'Actualizar' : 'Guardar'}</button>
+                            <button type="button" class="btn-cancel" id="form-cancel-btn">Cancelar</button> 
+                        </div>
+                    </div>
+                </form>
+            </div>`;
+
+        openModal(formModal); 
+        const form = formModal.querySelector('#generic-form'); 
+        const formCancelBtn = formModal.querySelector('#form-cancel-btn'); // Seleccionar el botón de cancelar
+        if (!form) return;
+
+        // Asignar el evento de clic al botón de Cancelar
+        if (formCancelBtn) {
+            formCancelBtn.addEventListener('click', () => {
+                closeModal(formModal);
+            });
+        }
+        
+        form.onsubmit = async function(e) { 
+            e.preventDefault(); 
+            const formData = {}; 
+            let isValid = true; 
+            conf.formFields.forEach(f => { 
+                const input = form.querySelector(`#${f.id}`); 
+                if (input) { 
+                    formData[f.id] = input.value; 
+                    if (!input.checkValidity()) { 
+                        isValid = false; 
+                        console.warn(`Inválido: ${f.id}`, input.validationMessage); 
+                    } 
+                } 
+            }); 
+            
+            if (!isValid) { 
+                showErrorModal("Inválido", "Corrige los errores."); 
+                return; 
+            } 
+            
+            let result; 
+            const formValues = Object.values(formData); 
+            console.log("Enviando:", isEditing ? { id: editId, ...formData } : formData); 
+            const submitBtn = form.querySelector('button[type="submit"]'); 
+            
+            try { 
+                if(submitBtn) submitBtn.disabled = true; 
+                if (isEditing) { 
+                    result = await conf.updateData(editId, ...formValues); 
+                } else { 
+                    result = await conf.saveData(...formValues); 
+                } 
+                if(submitBtn) submitBtn.disabled = false; 
+                console.log("Respuesta API:", result); 
+                
+                if (result && result.status === 'success') { 
+                    await renderData(conf); 
+                    closeModal(formModal); 
+                    showSuccessToast(`Se ${isEditing ? 'actualizó' : 'guardó'} ${conf.title}.`); 
+                } else { 
+                    showErrorModal('Error al guardar', result?.message || 'Error API.'); 
+                } 
+            } catch (error) { 
+                if(submitBtn) submitBtn.disabled = false; 
+                console.error('Error form submit:', error); 
+                showErrorModal('Error conexión', error.message || 'No se pudo guardar.'); 
+            } 
+        };
     }
 
     // ========================================
@@ -234,7 +364,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const id = row?.dataset.id;
             const typeKey = getTypeKeyFromElement(row || btn.closest('.tab-content'));
 
-            // Prevenir comportamiento default solo si es necesario
             if (action?.startsWith('add-') || btn.classList.contains('delete-btn') || btn.classList.contains('edit-btn') || btn.classList.contains('fingerprint-btn')) {
                 e.preventDefault();
             }
@@ -245,15 +374,17 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             // --- Acción Eliminar ---
             else if (btn.classList.contains('delete-btn')) {
-                console.log("🖱️ CLICK detectado en o cerca de DELETE BTN", e.target);
-                // *** CORRECCIÓN 1: Verificar si el clic fue realmente en el botón de borrar ***
                 if (e.target !== btn && !btn.contains(e.target)) {
                      console.log("Clic cerca delete-btn ignorado."); return;
                 }
-                // *** FIN CORRECCIÓN 1 ***
                 if (!id || !typeKey) { console.warn("Delete: ID/Tipo N/A"); return; }
                 const confirmed = await showConfirmationModal({ title: '¿Seguro?', message: `Eliminar ${config[typeKey]?.title || 'elemento'}. No se puede deshacer.`, confirmText: 'Eliminar', confirmClass: 'btn-danger' });
-                if (confirmed) { console.log(`Eliminando ${typeKey} ID ${id}`); const result = await config[typeKey].deleteData(id); if (result && result.status === 'success') { await renderData(config[typeKey]); showSuccessToast('Eliminado.'); } else { showErrorModal('Error al eliminar', result?.message || 'Error API.'); } }
+                if (confirmed) { 
+                    console.log(`Eliminando ${typeKey} ID ${id}`); 
+                    const result = await config[typeKey].deleteData(id); 
+                    if (result && result.status === 'success') { await renderData(config[typeKey]); showSuccessToast('Eliminado.'); } 
+                    else { showErrorModal('Error al eliminar', result?.message || 'Error API.'); } 
+                }
             }
             // --- Acción Editar ---
             else if (btn.classList.contains('edit-btn')) {
@@ -265,7 +396,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // --- Acción Huella ---
             else if (btn.classList.contains('fingerprint-btn')) {
                  if (!id || !typeKey || (typeKey !== 'vendedor' && typeKey !== 'repartidor')) { console.warn("FP: ID/Tipo N/A o inválido"); showErrorModal("Error", "No aplicable."); return; }
-                openFingerprintModal(id, typeKey);
+                openFingerprintModal(id, tipo);
             }
         });
 
@@ -273,18 +404,17 @@ document.addEventListener('DOMContentLoaded', function() {
         cardContainer.addEventListener('change', async (e) => {
             const toggle = e.target.closest('.toggle-switch input[type="checkbox"]');
             if (!toggle) return;
-            
-
-            // *** CORRECCIÓN 2: Detener propagación del evento change ***
             e.stopPropagation();
-            // *** FIN CORRECCIÓN 2 ***
 
             const itemElement = toggle.closest('.payment-method-item');
             const id = itemElement?.dataset.id;
             const typeKey = getTypeKeyFromElement(itemElement);
+            
             if (!id || typeKey !== 'metodo') { console.warn("Toggle: ID/Tipo N/A o inválido", {id, typeKey}); toggle.checked = !toggle.checked; return; }
+            
             const newStatus = toggle.checked; const typeConfig = config[typeKey];
             console.log(`Cambiando estado ${typeKey} ${id} a ${newStatus ? 'activo' : 'inactivo'}`);
+            
             try {
                 const result = await typeConfig.updateStatusData(id, newStatus);
                 if (result && result.status === 'success') {
@@ -298,10 +428,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // ========================================
     // CIERRE DE MODALES (Global)
     // ========================================
-    document.addEventListener('click', (e) => { if (e.target.closest('.close-modal-btn')) { const m = e.target.closest('.modal'); if(m) closeModal(m); } else if (e.target.classList.contains('modal') && e.target.classList.contains('show')) { if (e.target.id === 'confirm-modal' && !document.getElementById('confirm-cancel-btn')) return; closeModal(e.target); } });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { const openModals = document.querySelectorAll('.modal.show'); if (openModals.length > 0) { closeModal(openModals[openModals.length - 1]); } } });
+    document.addEventListener('click', (e) => { 
+        if (e.target.closest('.close-modal-btn')) { 
+            const m = e.target.closest('.modal'); 
+            if(m) closeModal(m); 
+        } else if (e.target.classList.contains('modal') && e.target.classList.contains('show')) { 
+            // Si el clic es en el overlay de un modal, y NO es el modal de confirmación (que tiene su propia lógica de cierre con botones)
+            // Y no es el botón de cancelar dentro de los modales de formulario
+            if (e.target.id === 'confirm-modal' && !document.getElementById('confirm-cancel-btn')) return;
+            closeModal(e.target); 
+        } 
+    });
+    
+    document.addEventListener('keydown', (e) => { 
+        if (e.key === 'Escape') { 
+            const openModals = document.querySelectorAll('.modal.show'); 
+            if (openModals.length > 0) { 
+                closeModal(openModals[openModals.length - 1]); 
+            } 
+        } 
+    });
 
-       // ========================================
+    // ========================================
     // MANEJO DEL LOGOUT PARA AGREGARINFO
     // ========================================
     const btnLogout = document.getElementById('logout-btn');
@@ -327,4 +475,4 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-}); 
+});

@@ -1,1 +1,0 @@
-Recibido en updateMetodoStatus: {"id":"28","activo":0,"action":"update_metodo_status"}

@@ -1,7 +1,7 @@
-/* ======================================================
-   ESTILOS ESPECÍFICOS PARA LA PÁGINA DE AGREGAR INFORMACIÓN
-   (VERSIÓN LIMPIA Y CORREGIDA)
-   ====================================================== */
+/* ====================================================== 
+  ESTILOS ESPECÍFICOS PARA LA PÁGINA DE AGREGAR INFORMACIÓN
+  (VERSIÓN COMPLETA Y CORREGIDA)
+  ====================================================== */
 
 .content-wrapper {
     position: relative;
@@ -9,12 +9,12 @@
     padding: 40px;
 }
 
-/* Título principal */
+/* --- Título principal --- */
 .main-title {
     font-size: 36px;
     font-weight: 700;
     margin-bottom: 30px;
-    color: #ff0000;
+    color: #333;
 }
 
 .title-underline {
@@ -24,7 +24,7 @@
     margin-top: 8px;
 }
 
-/* Pestañas (Cards) */
+/* --- Pestañas (Cards) --- */
 .tabs-container {
     display: flex;
     justify-content: center;
@@ -35,12 +35,12 @@
 .tab-card {
     width: 80px;
     height: 80px;
-    background-color: rgb(224, 16, 16);
+    background-color: #e0e0e0;
     border: none;
     border-radius: 16px;
     cursor: pointer;
     font-size: 32px;
-    color: #ffffff;
+    color: #666;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -51,6 +51,8 @@
 .tab-card:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transform: translateY(-2px);
+    background-color: #d90429;
+    color: white;
 }
 
 .tab-card.active {
@@ -58,7 +60,7 @@
     color: white;
 }
 
-/* Card contenedor */
+/* --- Card contenedor del contenido --- */
 .card {
     background-color: white;
     border-radius: 12px;
@@ -66,7 +68,7 @@
     padding: 32px;
 }
 
-/* Contenido de pestañas */
+/* --- Contenido de pestañas --- */
 .tab-content {
     display: none;
 }
@@ -82,7 +84,7 @@
     color: #000;
 }
 
-/* Botones */
+/* --- Botones generales --- */
 .btn-primary {
     background-color: #d90429;
     color: white;
@@ -110,7 +112,7 @@
     font-size: 16px;
 }
 
-/* Tabla */
+/* --- Tabla --- */
 .data-table {
     width: 100%;
     border-collapse: collapse;
@@ -131,6 +133,7 @@
 .data-table td {
     padding: 16px;
     border-bottom: 1px solid #e5e7eb;
+    color: #374151; 
 }
 
 .data-table tbody tr:hover {
@@ -148,7 +151,7 @@
     display: inline-block;
 }
 
-/* Estado de huella */
+/* --- Estado de huella --- */
 .fingerprint-status {
     display: inline-flex;
     align-items: center;
@@ -169,7 +172,7 @@
     color: #047857;
 }
 
-/* Botones de acción */
+/* --- Botones de acción --- */
 .action-btn {
     background: none;
     border: none;
@@ -196,7 +199,7 @@
     color: #dc2626;
 }
 
-/* Header con acciones (Destinos) */
+/* --- Header con acciones --- */
 .header-actions {
     display: flex;
     justify-content: space-between;
@@ -204,6 +207,7 @@
     margin-bottom: 24px;
 }
 
+/* --- Buscador --- */
 .search-box {
     position: relative;
     display: flex;
@@ -231,14 +235,14 @@
     border-color: #d90429;
 }
 
-/* Lista de destinos */
-.destinations-list {
+/* --- Listas --- */
+.destinations-list, .payment-methods-list {
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
-.destination-item {
+.destination-item, .payment-method-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -248,22 +252,22 @@
     transition: background-color 0.3s;
 }
 
-.destination-item:hover {
+.destination-item:hover, .payment-method-item:hover {
     background-color: #f9fafb;
 }
 
-.destination-info {
+.destination-info, .payment-info {
     display: flex;
     align-items: center;
     gap: 16px;
 }
 
-.destination-info i {
+.destination-info i, .payment-info i {
     font-size: 24px;
     color: #d90429;
 }
 
-.destination-info h3 {
+.destination-info h3, .payment-info h3 {
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 4px;
@@ -272,49 +276,6 @@
 .destination-info p {
     font-size: 14px;
     color: #6b7280;
-}
-
-.destination-actions {
-    display: flex;
-    gap: 8px;
-}
-
-/* Lista de métodos de pago */
-.payment-methods-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.payment-method-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    transition: background-color 0.3s;
-}
-
-.payment-method-item:hover {
-    background-color: #f9fafb;
-}
-
-.payment-info {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.payment-info i {
-    font-size: 24px;
-    color: #d90429;
-}
-
-.payment-info h3 {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 4px;
 }
 
 .status-active {
@@ -327,13 +288,13 @@
     color: #6b7280;
 }
 
-.payment-actions {
+.destination-actions, .payment-actions {
     display: flex;
     align-items: center;
     gap: 16px;
 }
 
-/* Toggle Switch */
+/* --- Toggle Switch --- */
 .toggle-switch {
     position: relative;
     display: inline-block;
@@ -379,7 +340,11 @@ input:checked + .slider:before {
     transform: translateX(24px);
 }
 
-/* Modal */
+/* ======================================================
+  ESTILOS CRÍTICOS PARA MODALES DE AGREGAR (NUEVO DISEÑO)
+  ====================================================== */
+
+/* --- Modal base (Overlay) --- */
 .modal {
     display: none;
     position: fixed;
@@ -391,280 +356,330 @@ input:checked + .slider:before {
     background-color: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
+    overflow-y: auto; 
+    padding: 20px 0;
 }
 
 .modal.show {
     display: flex;
 }
 
+/* --- Contenido del modal (el cuadro blanco) --- */
 .modal-content {
-    background-color: white;
+    background: white;
     border-radius: 12px;
-    padding: 40px;
-    max-width: 450px;
+    padding: 0;
     width: 90%;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-}
-
-.modal-body {
-    text-align: center;
-}
-
-.fingerprint-icon {
-    font-size: 80px;
-    color: #d90429;
-    margin-bottom: 24px;
-}
-
-.modal-body h2 {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 12px;
-}
-
-.modal-body p {
-    color: #6b7280;
-    margin-bottom: 24px;
-    font-size: 14px;
-}
-
-/* Pasos de progreso */
-.progress-steps {
+    max-width: 400px; /* Ancho profesional */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden; 
+    max-height: 90vh; 
     display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 16px;
+    flex-direction: column;
 }
 
-.step {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 2px solid #d1d5db;
-    background-color: white;
-    color: #9ca3af;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 18px;
-    transition: all 0.3s;
-}
-
-.step.active {
-    background-color: #d90429;
-    border-color: #d90429;
-    color: white;
-}
-
-.progress-text {
-    font-size: 14px;
-    color: #6b7280;
-    margin-bottom: 24px;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .content-wrapper {
-        padding: 20px;
-    }
-
-    .main-title {
-        font-size: 28px;
-    }
-
-    .tabs-container {
-        gap: 12px;
-    }
-
-    .tab-card {
-        width: 70px;
-        height: 70px;
-        font-size: 28px;
-    }
-
-    .card {
-        padding: 20px;
-    }
-
-    .data-table {
-        font-size: 14px;
-    }
-
-    .data-table th,
-    .data-table td {
-        padding: 12px 8px;
-    }
-
-    .header-actions {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-    }
-
-    .search-box input {
-        width: 100%;
-    }
-}
-
-/* ESTILOS AÑADIDOS PARA EL MODAL DE FORMULARIOS */
+/* --- Encabezado del modal (NUEVO DISEÑO) --- */
 .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
+    padding: 20px 24px;
     border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb; /* Fondo gris muy claro */
+    position: sticky; 
+    top: 0; 
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .modal-header h2 {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+    text-align: center;
+    flex-grow: 1;
 }
 
+/* --- Botón cerrar (La 'X') --- */
 .close-modal-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
     background: none;
     border: none;
-    font-size: 30px;
-    font-weight: 300;
+    font-size: 24px;
     color: #9ca3af;
     cursor: pointer;
-    line-height: 1;
-    transition: color 0.3s;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 15; 
+    overflow: hidden;
+    text-indent: -9999px; /* Oculta el texto si lo hubiera */
+}
+
+/* Fuerza la 'X' visualmente */
+.close-modal-btn::before {
+    content: '×'; 
+    font-family: Arial, sans-serif;
+    font-size: 28px;
+    font-weight: 300;
+    color: #9ca3af;
+    text-indent: 0; 
+    line-height: 32px; 
 }
 
 .close-modal-btn:hover {
-    color: #1f2937;
+    background: #f3f4f6;
 }
 
+.close-modal-btn:hover::before {
+    color: #374151;
+}
+
+/* --- Cuerpo del modal (Formulario) (NUEVO DISEÑO) --- */
+.modal-body {
+    padding: 24px; /* Padding unificado */
+    overflow-y: auto; 
+    flex-grow: 1;
+    background: #ffffff;
+}
+
+/* --- Formulario y Grupos --- */
 #generic-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    width: 100%;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
+    width: 100%;
+    margin-bottom: 24px; /* Espacio entre el último input y los botones */
 }
 
 .form-group label {
     font-weight: 600;
     font-size: 14px;
     color: #374151;
+    margin-bottom: 4px;
 }
 
+/* Inputs con fondo gris */
 .form-group input,
 .form-group select {
-    padding: 12px;
-    border: 1px solid #d1d5db;
+    padding: 12px 14px;
+    border: 1px solid #e5e7eb; 
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 15px;
     font-family: 'Poppins', sans-serif;
     outline: none;
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    border-color: #d90429;
-    box-shadow: 0 0 0 2px rgba(217, 4, 41, 0.2);
-}
-
-.form-actions {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-.btn-secondary {
-    background-color: #e5e7eb;
-    color: #374151;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.btn-secondary:hover {
-    background-color: #d1d5db;
-}
-
-/* Ajustes menores */
-.header-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-}
-
-.header-actions .section-title {
-    margin-bottom: 0;
-}
-
-/* ======================================================
-   CSS NUEVO (Punto 4: Modales de Alerta y Toast)
-   ====================================================== */
-
-#confirm-modal-content {
-    text-align: center;
-    max-width: 400px;
-    padding: 30px;
-}
-
-#confirm-modal-content h3 {
-    font-size: 22px;
-    font-weight: 700;
-    margin-bottom: 16px;
+    transition: border-color 0.2s, background-color 0.2s;
+    background: #f9fafb;
     color: #1f2937;
 }
 
-#confirm-modal-content p {
-    font-size: 16px;
-    color: #6b7280;
-    margin-bottom: 32px;
-    line-height: 1.6;
+.form-group input::placeholder {
+    color: #9ca3af;
 }
 
-.confirm-actions {
+/* Focus sutil */
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #d90429; 
+    background: #fff; 
+    box-shadow: none; /* Sin sombra */
+}
+
+/* --- Botones del formulario (Acciones) (NUEVO DISEÑO) --- */
+.form-actions {
     display: flex;
+    gap: 12px;
     justify-content: center;
-    gap: 16px;
+    width: 100%;
+    margin-top: 24px; /* Espacio entre los campos y los botones */
+    /* No necesita padding, ya que está DENTRO de modal-body */
 }
 
-/* Botón de peligro (para eliminar) */
-.btn-danger {
-    background-color: #d90429;
+/* Estilo para los botones principales y de guardar */
+.btn-save {
+    background: #d90429;
     color: white;
     border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
+    padding: 12px 30px;
+    border-radius: 12px; /* Esquinas redondeadas */
+    font-size: 15px;
+    font-weight: 700; /* Texto más grueso */
+    cursor: pointer;
+    transition: all 0.3s;
+    flex: 1; /* Ocupan el mismo espacio */
+}
+
+.btn-save:hover {
+    background: #b8032a;
+}
+
+/* Estilo para el botón de cancelar (sin "X") */
+.btn-cancel {
+    background: #e5e7eb; /* Fondo gris claro */
+    color: #374151; /* Texto gris oscuro */
+    border: none;
+    padding: 12px 30px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    flex: 1;
+    position: static; /* Aseguramos que no se posicione de forma extraña */
+    margin: 0; /* Reiniciar márgenes */
+}
+
+.btn-cancel:hover {
+    background: #d1d5db; /* Fondo ligeramente más oscuro al pasar el ratón */
+}
+
+/* --- Responsive para móviles --- */
+@media (max-width: 768px) {
+    .content-wrapper {
+        padding: 20px;
+    }
+    .tabs-container {
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+    .tab-card {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+    }
+    .card {
+        padding: 24px;
+    }
+    .modal-content {
+        width: 95%;
+        max-width: 95%;
+        margin: 10px;
+    }
+    .modal-header {
+        padding: 20px 20px 12px;
+    }
+    .modal-body {
+        padding: 20px; 
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-actions {
+        flex-direction: column; /* Botones apilados en móvil */
+        gap: 8px;
+        margin-top: 20px; /* Ajustar el margen superior en móvil */
+    }
+    .btn-save,
+    .btn-cancel {
+        width: 100%;
+        flex: none; /* Desactiva el flex-grow en móvil */
+    }
+    .close-modal-btn {
+        top: 15px;
+        right: 15px;
+    }
+}
+
+/* --- Animación de entrada del modal --- */
+@keyframes modalEnter {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.modal.show .modal-content {
+    animation: modalEnter 0.3s ease-out;
+}
+
+/* --- Estilo de modal de confirmación/error (Para el modal de "Inválido") --- */
+#confirm-modal {
+    z-index: 2000;
+    background-color: transparent; /* No oscurece el modal de abajo */
+}
+
+#confirm-modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 350px; 
+    padding: 24px; 
+    text-align: left; 
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+#confirm-modal-content h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+#confirm-modal-content p {
     font-size: 14px;
-    font-weight: 600;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* Botones dentro del modal de confirmación */
+#confirm-modal-content .btn-primary,
+#confirm-modal-content .btn-save,
+#confirm-modal-content .btn-danger,
+#confirm-modal-content .btn-secondary {
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px; /* Esquinas redondeadas */
+    font-size: 14px;
+    font-weight: 700;
     cursor: pointer;
     transition: background-color 0.3s;
+    margin-bottom: 0; 
+    width: auto; 
+    align-self: flex-start;
 }
 
-.btn-danger:hover {
-    background-color: #b8032a;
-}
-
-/* Estilo para el "Toast" de éxito */
-.success-toast {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #059669;
+#confirm-modal-content .btn-primary,
+#confirm-modal-content .btn-save {
+    background: #d90429;
     color: white;
-    padding: 16px 24px;
-    border-radius: 8px;
-    z-index: 2000;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+#confirm-modal-content .btn-primary:hover,
+#confirm-modal-content .btn-save:hover {
+     background-color: #b8032a;
+}
+
+#confirm-modal-content .confirm-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+#confirm-modal-content .btn-danger {
+     background-color: #ef4444;
+     color: white;
+}
+#confirm-modal-content .btn-danger:hover {
+     background-color: #dc2626;
+}
+
+#confirm-modal-content .btn-secondary {
+     background-color: #e5e7eb;
+     color: #374151;
+}
+#confirm-modal-content .btn-secondary:hover {
+     background-color: #d1d5db;
 }

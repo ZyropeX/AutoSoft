@@ -74,14 +74,14 @@ const api = {
             return result;
         }),
     saveVendedor: (nombre) => callApi('create_vendedor', 'POST', { nombre }),
-    updateVendedor: (id, nombre) => callApi('update_vendedor', 'POST', { id, nombre }), // Usar POST como en PHP
+    updateVendedor: (id, nombre) => callApi('update_vendedor', 'POST', { id, nombre }),
     deleteVendedor: (id) => callApi('delete_vendedor', 'POST', { id }),
 
     // ==================
     // REPARTIDORES
     // ==================
     getRepartidores: () => callApi('get_repartidores'),
-    getRepartidorById: (id) => callApi('get_repartidor_by_id', 'GET', { id }, true) // Método GET para ById
+    getRepartidorById: (id) => callApi('get_repartidor_by_id', 'GET', { id }, true)
         .then(result => { // Adaptar respuesta
             if (result.status === 'success' && result.data) {
                 result.data = { nombre: result.data.nombre };
@@ -89,14 +89,14 @@ const api = {
             return result;
         }),
     saveRepartidor: (nombre) => callApi('create_repartidor', 'POST', { nombre }),
-    updateRepartidor: (id, nombre) => callApi('update_repartidor', 'POST', { id, nombre }), // Usar POST
+    updateRepartidor: (id, nombre) => callApi('update_repartidor', 'POST', { id, nombre }),
     deleteRepartidor: (id) => callApi('delete_repartidor', 'POST', { id }),
 
     // ==================
     // DESTINOS
     // ==================
     getDestinos: () => callApi('get_destinos'),
-    getDestinoById: (id) => callApi('get_destino_by_id', 'GET', { id }, true) // Método GET para ById
+    getDestinoById: (id) => callApi('get_destino_by_id', 'GET', { id }, true)
         .then(result => { // Adaptar respuesta
             if (result.status === 'success' && result.data) {
                 result.data = { lugar: result.data.lugar, direccion: result.data.direccion };
@@ -104,7 +104,7 @@ const api = {
             return result;
         }),
     saveDestino: (lugar, direccion) => callApi('create_destino', 'POST', { lugar, direccion }),
-    updateDestino: (id, lugar, direccion) => callApi('update_destino', 'POST', { id, lugar, direccion }), // Usar POST
+    updateDestino: (id, lugar, direccion) => callApi('update_destino', 'POST', { id, lugar, direccion }),
     deleteDestino: (id) => callApi('delete_destino', 'POST', { id }),
 
     // ==================
@@ -113,21 +113,19 @@ const api = {
     getMetodosPago: () => callApi('get_metodos_pago'),
     
     getMetodosPagoActivos: () => callApi('get_metodos_pago')
-        .then(result => {
-            // ✅ Filtrar solo métodos ACTIVOS (activo = 1)
-            if (result.status === 'success' && Array.isArray(result.data)) {
-                result.data = result.data.filter(m => {
-                    const activo = m.activo ?? m.ACTIVO ?? 0;
-                    return parseInt(activo) === 1;
-                });
-            }
-            return result;
-        }),
+        .then(result => {
+            // ✅ Filtrar solo métodos ACTIVOS (activo = 1)
+            if (result.status === 'success' && Array.isArray(result.data)) {
+                result.data = result.data.filter(m => {
+                    const activo = m.activo ?? m.ACTIVO ?? 0;
+                    return parseInt(activo) === 1;
+                });
+            }
+            return result;
+        }),
 
-    saveMetodoPago: (nombre) => callApi('create_metodo_pago', 'POST', { nombre }),
-// ...
     saveMetodoPago: (nombre) => callApi('create_metodo_pago', 'POST', { nombre }),
-    updateMetodoPago: (id, nombre) => callApi('update_metodo_pago', 'POST', { id, nombre }), // Usar POST
+    updateMetodoPago: (id, nombre) => callApi('update_metodo_pago', 'POST', { id, nombre }),
     updateMetodoStatus: (id, activo) => callApi('update_metodo_status', 'POST', { id, activo: activo ? 1 : 0 }),
     deleteMetodoPago: (id) => callApi('delete_metodo_pago', 'POST', { id }),
 
@@ -138,21 +136,21 @@ const api = {
     verifyFingerprintData: (tipo_persona, datos_huella) => callApi('verify_fingerprint', 'POST', { tipo_persona, datos_huella }),
 
     // ==================
-    // OTRAS FUNCIONES API (DESCOMENTADAS)
+    // AUTENTICACIÓN Y OTRAS FUNCIONES
     // ==================
     login: (usuario_login, contraseña) => callApi('login', 'POST', { usuario_login, contraseña }),
-    getAsistenciasDelDia: () => callApi('get_asistencia_del_dia'), // Nombre usado por asistencias.js
+    getAsistenciasDelDia: () => callApi('get_asistencia_del_dia'),
     updateAsistencia: (asistenciaData) => callApi('update_asistencia', 'POST', asistenciaData),
     getRepartos: () => callApi('get_repartos'),
-    saveReparto: (repartoData) => callApi('create_reparto', 'POST', repartoData), // Nombre usado por bitacora.js
+    saveReparto: (repartoData) => callApi('create_reparto', 'POST', repartoData),
     finalizarReparto: (repartoId) => callApi('finalizar_reparto', 'POST', { id: repartoId }),
     getConfiguracion: () => callApi('get_configuracion'),
-    saveConfiguracion: (configData) => callApi('save_configuracion', 'POST', configData), // Nombre usado por pagos.js
+    saveConfiguracion: (configData) => callApi('save_configuracion', 'POST', configData),
     calcularPagos: (params) => callApi('calcular_pagos', 'POST', params),
-    saveReporte: (reporteData) => callApi('save_reporte', 'POST', reporteData), // Nombre usado por pagos.js
+    saveReporte: (reporteData) => callApi('save_reporte', 'POST', reporteData),
 
-      // ==================
-    // REPORTES (DASHBOARD)
+    // ==================
+    // MÉTODO GENÉRICO PARA DASHBOARD/REPORTES
     // ==================
     callApi: (action, method = 'POST', data = null) => {
         let url = `${BASE_URL}/api.php?action=${action}`;
@@ -179,11 +177,8 @@ const api = {
                 console.error('API Error:', error);
                 return { status: 'error', message: error.message };
             });
-    },
+    }
 
 }; // Fin del objeto 'api'
 
-
-export { api }; // <<--- ESTA DEBE SER LA ÚLTIMA LÍNEA DEL ARCHIVO
-// ---------------------------------------------
-// (NO DEBE HABER NADA DESPUÉS DE ESTA LÍNEA)
+export { api };

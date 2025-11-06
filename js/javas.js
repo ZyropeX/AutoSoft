@@ -42,13 +42,26 @@ async function handleLogin() {
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
 
+    // Validar que no estén vacíos
+    if (!username || !password) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Campos Vacíos',
+            text: 'Por favor completa el usuario y la contraseña.',
+            confirmButtonColor: '#d90429'
+        });
+        return;
+    }
+
     try {
         // Llama a nuestro servicio centralizado para obtener la respuesta de la API
         const response = await api.login(username, password);
         
+        console.log('Respuesta de login:', response);
+
         // Verifica si el login fue exitoso según el 'status' de la respuesta
-        if (response.status === 'success') {
-            const empleado = response.data; // Extrae los datos del empleado
+        if (response.status === 'success' && response.data) {
+            const empleado = response.data;
             
             console.log("Login exitoso para:", empleado.nombre, "con rol:", empleado.rol);
 
@@ -66,20 +79,28 @@ async function handleLogin() {
                 allowOutsideClick: false
             });
             
-            window.location.href = '../html/bitacora.html';
+            window.location.href = './bitacora.html';
 
         } else {
-            // Si el status no es 'success', lanzamos un error con el mensaje de la API
-            throw new Error(response.message);
+            // Si el status no es 'success', extraer el mensaje de error
+            const errorMessage = response.message || 'Error desconocido en el servidor. Intenta de nuevo.';
+            console.error('Error de login:', errorMessage);
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'Acceso Denegado',
+                text: errorMessage,
+                confirmButtonColor: '#d90429'
+            });
         }
 
     } catch (error) {
-        // Este bloque ahora atrapa tanto errores de red como credenciales incorrectas
-        console.error('Error de login:', error.message);
+        // Este bloque atrapa errores inesperados
+        console.error('Excepción en login:', error);
         Swal.fire({
             icon: 'error',
-            title: 'Acceso Denegado',
-            text: 'El usuario o la contraseña son incorrectos.',
+            title: 'Error del Sistema',
+            text: 'Ocurrió un error inesperado. Intenta de nuevo.',
             confirmButtonColor: '#d90429'
         });
     }
