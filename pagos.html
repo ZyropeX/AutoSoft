@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Pago</title>
 
-    <link rel="stylesheet" href="/kung-fu/css/main.css">
+    <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="/kung-fu/css/pagos.css">
+    <link rel="stylesheet" href="css/pagos.css">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script> 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -23,7 +23,7 @@
             <h1 class="header-title">Gestión de Pago</h1>
         </header>
         <div class="blob_derecha">
-            <img src="/kung-fu/src/blob_derecha.svg" alt="blob_derecha">
+            <img src="src/blob_derecha.svg" alt="blob_derecha">
         </div>
 
         <div class="content-container">
@@ -84,9 +84,9 @@
                                         <th>SUELDO BASE</th>
                                         <th>VIAJES HECHOS</th>
                                         <th>SUELDO POR VIAJES</th>
-                                        <th>TOTAL BRUTO</th>
+                                        <th> TOTAL </th>
                                         <th>DESC. FALTAS</th>
-                                        <th>TOTAL NETO</th>
+                                        <th>SUELDO TOTAL</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tablaPagos"></tbody>
@@ -106,9 +106,9 @@
     <!-- Contenedor oculto para impresión -->
     <div id="print-container" class="print-container"></div>
 
-    <script src="/kung-fu/js/main.js" defer></script>
-    <script src="/kung-fu/js/apiService.js" defer></script>
-    <script type="module" src="/kung-fu/js/pagos.js" defer></script>
+    <script src="js/main.js" defer></script>
+    <script src="js/apiService.js" defer></script>
+    <script type="module" src="js/pagos.js" defer></script>
 </body>
 
 <div class="modal" id="confirm-modal">

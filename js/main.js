@@ -1,47 +1,50 @@
-// js/main.js (Versión Mejorada y con Roles)
+/**
+ * main.js
+ * Encargado de la lógica global de UI: Sidebar, Seguridad de Roles y Logout.
+ * No requiere importar apiService porque trabaja con localStorage.
+ */
 
 document.addEventListener("DOMContentLoaded", function() {
+    console.log("🎨 Cargando UI principal...");
 
-    // --- INICIO: Bloqueo de páginas para 'bodega' ---
+    // ============================================
+    // 1. SEGURIDAD DE ROLES (BODEGA)
+    // ============================================
     const userRole = localStorage.getItem('currentUserRole');
     const currentPage = window.location.pathname.split("/").pop();
 
-    // 1. Define las páginas restringidas para bodega
-    // (Asumo que 'reportes.html' es tu dashboard)
+    // Páginas prohibidas para el rol 'bodega'
     const restrictedPages = [
         'pagos.html', 
         'agregarInfo.html', 
         'reportes.html' 
     ];
 
-    // 2. Comprueba si el rol es 'bodega' y si está en una página restringida
     if (userRole === 'bodega' && restrictedPages.includes(currentPage)) {
-        
-        // 3. Si es así, muéstrale una alerta y sácalo de ahí
+        console.warn(`⛔ Acceso denegado a ${userRole} en ${currentPage}`);
         alert('Acceso Denegado. No tienes permiso para ver esta página.');
-        window.location.href = 'bitacora.html'; // Mándalo a su página principal permitida
-        
-        // 4. Detiene la ejecución del resto del script
+        window.location.href = 'bitacora.html'; // Redirigir a zona segura
         return; 
     }
-    // --- FIN: Bloqueo de páginas ---
 
-
+    // ============================================
+    // 2. CARGAR SIDEBAR (Barra Lateral)
+    // ============================================
     const sidebarContainer = document.getElementById('sidebar-container');
 
     if (sidebarContainer) {
+        // Fetch relativo al HTML actual (src/sidebar.html)
         fetch('./sidebar.html')
             .then(response => {
-                if (!response.ok) throw new Error('No se pudo cargar la barra lateral.');
+                if (!response.ok) throw new Error('No se encontró sidebar.html');
                 return response.text();
             })
             .then(data => {
                 sidebarContainer.innerHTML = data;
-                initializeSidebar(); // Llama a la función que ahora tiene tu código
+                initializeSidebar(); // Inicializar eventos después de cargar HTML
             })
             .catch(error => {
-                console.error('Error al cargar el sidebar:', error);
-                sidebarContainer.innerHTML = '<p style="color:white; padding: 10px;">Error al cargar menú.</p>';
+                console.error('Error cargando sidebar:', error);
             });
     }
 });
@@ -52,76 +55,80 @@ function initializeSidebar() {
     const toggleBtn = document.getElementById('sidebar-toggle');
     const logoutBtn = document.getElementById('logout-btn');
 
-    // --- INICIO DE LA MODIFICACIÓN: Mostrar nombre de usuario ---
-    // 1. Lee el nombre guardado (que javas.js guardó en el login)
+    // --- MOSTRAR NOMBRE DE USUARIO ---
     const nombreGuardado = localStorage.getItem('currentUser');
-    
-    // 2. Busca el <span> del perfil en el sidebar
     const elementoNombre = document.getElementById('nombre-usuario-sidebar');
     
-    // 3. Si ambos existen, actualiza el texto "Perfil" por el nombre
     if (nombreGuardado && elementoNombre) {
         elementoNombre.textContent = nombreGuardado;
     }
-    // --- FIN DE LA MODIFICACIÓN ---
 
-    // --- INICIO: Ocultar vistas para 'bodega' ---
+    // --- OCULTAR ENLACES PARA BODEGA ---
     const currentRole = localStorage.getItem('currentUserRole');
-
     if (currentRole === 'bodega') {
-        const pagosLink = document.querySelector('a[href="pagos.html"]');
-        const agregarInfoLink = document.querySelector('a[href="agregarInfo.html"]');
-        const reportesLink = document.getElementById('reportes-link'); 
+        const enlacesOcultos = [
+            'pagos.html',
+            'agregarInfo.html',
+            'reportes.html' // O el ID reportes-link
+        ];
 
-        if (pagosLink) pagosLink.style.display = 'none';
-        if (agregarInfoLink) agregarInfoLink.style.display = 'none';
-        if (reportesLink) reportesLink.style.display = 'none'; 
-    }
-    // --- FIN: Ocultar vistas ---
-
-    if (!sidebar || !mainContent) return;
-
-    // La barra inicia cerrada por defecto
-    sidebar.classList.add('collapsed');
-
-    // Lógica para expandir/colapsar la barra
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
+        enlacesOcultos.forEach(page => {
+            // Buscar por href
+            const link = document.querySelector(`a[href="${page}"]`);
+            if (link) link.style.display = 'none';
+            
+            // Buscar por ID específico (caso reportes)
+            const linkId = document.getElementById('reportes-link');
+            if (linkId) linkId.style.display = 'none';
         });
     }
 
-    // Lógica mejorada para el botón de Cerrar Sesión
+    // --- FUNCIONALIDAD COLAPSAR BARRA ---
+    if (sidebar && mainContent) {
+        // Iniciar colapsada en móviles o según preferencia
+        sidebar.classList.add('collapsed');
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+            });
+        }
+    }
+
+    // --- LOGOUT (CERRAR SESIÓN) ---
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
+            
             Swal.fire({
-                title: '¿Estás seguro?',
-                text: "Estás a punto de cerrar la sesión.",
+                title: '¿Cerrar sesión?',
+                text: "¿Estás seguro de salir?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d90429',
                 cancelButtonColor: '#6e7881',
-                confirmButtonText: 'Sí, cerrar sesión',
+                confirmButtonText: 'Sí, salir',
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Limpia los datos de la sesión del usuario
+                    // 1. Limpiar sesión
                     localStorage.removeItem('currentUser');
                     localStorage.removeItem('currentUserRole');
+                    localStorage.removeItem('currentUserId');
                     
-                    // --- CORRECCIÓN DE RUTA DE LOGOUT ---
-                    // Redirige al login (un nivel arriba, fuera de la carpeta /html)
-                    window.location.href = '../html/index.html'; 
+                    // 2. Redirigir al Login
+                    // Como bitacora.html e index.html (login) están en la misma carpeta 'src', 
+                    // la ruta correcta es simplemente 'index.html'.
+                    window.location.href = 'index.html'; 
                 }
             });
         });
     }
 
-    // Lógica para resaltar el botón de la página activa
+    // --- RESALTAR PÁGINA ACTIVA ---
     const currentPage = window.location.pathname.split("/").pop();
-    const navLinks = document.querySelectorAll('.sidebar-btn[href]');
+    const navLinks = document.querySelectorAll('.sidebar-btn');
 
     navLinks.forEach(link => {
         if (link.getAttribute('href') === currentPage) {
@@ -129,4 +136,3 @@ function initializeSidebar() {
         }
     });
 }
-

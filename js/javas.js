@@ -1,6 +1,8 @@
 import { api } from './apiService.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("🚀 Login script cargado");
+
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', (event) => {
@@ -9,24 +11,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Lógica para mostrar/ocultar contraseña (sin cambios) ---
+    // --- Lógica de Mostrar/Ocultar Contraseña ---
     const passwordInput = document.getElementById('password');
     const togglePassword = document.getElementById('togglePassword');
     const eyeOpen = document.getElementById('eyeOpen');
     const eyeClosed = document.getElementById('eyeClosed');
 
-    if (passwordInput) {
+    if (passwordInput && togglePassword) {
+        // Mostrar el icono solo si hay texto
         passwordInput.addEventListener('input', function() {
-            if (togglePassword) {
-                togglePassword.style.display = passwordInput.value.length > 0 ? 'block' : 'none';
-            }
+            togglePassword.style.display = passwordInput.value.length > 0 ? 'block' : 'none';
         });
-    }
 
-    if (togglePassword) {
+        // Click en el ojo
         togglePassword.addEventListener('click', function() {
             const isPassword = passwordInput.type === 'password';
             passwordInput.type = isPassword ? 'text' : 'password';
+            
             if (eyeOpen && eyeClosed) {
                 eyeOpen.style.display = isPassword ? 'none' : 'inline';
                 eyeClosed.style.display = isPassword ? 'inline' : 'none';
@@ -36,72 +37,92 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * Maneja el evento de login llamando al servicio de la API y verificando la respuesta.
+ * Función Principal de Login
  */
 async function handleLogin() {
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    
+    const usuario = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
 
-    // Validar que no estén vacíos
-    if (!username || !password) {
+    // 1. Validación básica
+    if (!usuario || !password) {
         Swal.fire({
             icon: 'warning',
-            title: 'Campos Vacíos',
-            text: 'Por favor completa el usuario y la contraseña.',
+            title: 'Datos incompletos',
+            text: 'Por favor ingresa usuario y contraseña.',
             confirmButtonColor: '#d90429'
         });
         return;
     }
 
+    // Mostrar feedback de carga
+    const submitBtn = document.querySelector('button[type="submit"]');
+    const originalText = submitBtn ? submitBtn.innerText : 'Entrar';
+    if(submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Verificando...';
+    }
+
     try {
-        // Llama a nuestro servicio centralizado para obtener la respuesta de la API
-        const response = await api.login(username, password);
+        console.log(`🔐 Intentando login para: ${usuario}...`);
+
+        // 2. Llamada a la API
+        // NOTA: Asegúrate que apiService tenga la función 'login' apuntando a /empleados/login
+        const response = await api.login(usuario, password);
         
-        console.log('Respuesta de login:', response);
+        console.log('Respuesta servidor:', response);
 
-        // Verifica si el login fue exitoso según el 'status' de la respuesta
-        if (response.status === 'success' && response.data) {
-            const empleado = response.data;
-            
-            console.log("Login exitoso para:", empleado.nombre, "con rol:", empleado.rol);
+        // 3. Verificación de éxito
+        // Java puede devolver el objeto empleado directamente O un wrapper {status: 'success'}
+        // Ajustamos la lógica para aceptar ambos casos
+        const esExito = (response.status === 'success') || (response.id && response.nombre) || (response.id_empleado);
 
-            // Guarda los datos en localStorage para usarlos en otras páginas
-            localStorage.setItem('currentUser', empleado.nombre);
-            localStorage.setItem('currentUserRole', empleado.rol);
+        if (esExito) {
+            // Extraer datos del empleado
+            const empleado = response.data || response; 
+            const nombreUser = empleado.nombre || empleado.usuario || usuario;
+            const rolUser = empleado.rol || empleado.puesto || 'empleado';
 
-            // Muestra la alerta de bienvenida y redirige
+            console.log("✅ Login correcto:", nombreUser);
+
+            // 4. Guardar sesión
+            localStorage.setItem('currentUser', nombreUser);
+            localStorage.setItem('currentUserRole', rolUser);
+            // Guardamos ID por si se necesita para operaciones
+            localStorage.setItem('currentUserId', empleado.id || empleado.id_empleado);
+
+            // 5. Redirección
             await Swal.fire({
                 icon: 'success',
-                title: `¡Bienvenido, ${empleado.nombre}!`,
-                text: 'Serás redirigido en un momento.',
-                timer: 2000,
-                showConfirmButton: false,
-                allowOutsideClick: false
+                title: `¡Hola, ${nombreUser}!`,
+                text: 'Ingresando al sistema...',
+                timer: 1500,
+                showConfirmButton: false
             });
             
-            window.location.href = './bitacora.html';
+            // Asumiendo que index.html y bitacora.html están en la misma carpeta src
+            window.location.href = './bitacora.html'; 
 
         } else {
-            // Si el status no es 'success', extraer el mensaje de error
-            const errorMessage = response.message || 'Error desconocido en el servidor. Intenta de nuevo.';
-            console.error('Error de login:', errorMessage);
-            
-            Swal.fire({
-                icon: 'error',
-                title: 'Acceso Denegado',
-                text: errorMessage,
-                confirmButtonColor: '#d90429'
-            });
+            // Error de credenciales
+            throw new Error(response.message || 'Usuario o contraseña incorrectos.');
         }
 
     } catch (error) {
-        // Este bloque atrapa errores inesperados
-        console.error('Excepción en login:', error);
+        console.error('❌ Error Login:', error);
+        
         Swal.fire({
             icon: 'error',
-            title: 'Error del Sistema',
-            text: 'Ocurrió un error inesperado. Intenta de nuevo.',
+            title: 'Acceso Denegado',
+            text: error.message || 'No se pudo conectar con el servidor.',
             confirmButtonColor: '#d90429'
         });
+    } finally {
+        if(submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = originalText;
+        }
     }
 }

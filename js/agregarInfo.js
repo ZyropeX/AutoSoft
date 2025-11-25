@@ -1,10 +1,8 @@
-// Importar 'api' desde apiService.js (requiere type="module" en HTML)
 import { api } from './apiService.js';
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("=== PÁGINA AGREGAR INFO CARGADA ==="); 
+    console.log("=== PÁGINA AGREGAR INFO CARGADA (MODO AWS) ==="); 
 
-    
     // ========================================
     // CONFIGURACIÓN CENTRALIZADA
     // ========================================
@@ -18,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updateData: api.updateVendedor,
             deleteData: api.deleteVendedor,
             renderItem: (item) => `
-                <tr data-id="${item.id_vendedor}">
+                <tr data-id="${item.id_vendedor || item.id}">
                     <td>${item.nombre || ''}</td>
                     <td><span class="badge-active">Activo</span></td>
                     <td><button class="action-btn fingerprint-btn" title="Registrar Huella"><i class="fas fa-fingerprint"></i></button></td>
@@ -41,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updateData: api.updateRepartidor,
             deleteData: api.deleteRepartidor,
             renderItem: (item) => `
-                <tr data-id="${item.id_repartidor}">
+                <tr data-id="${item.id_repartidor || item.id}">
                     <td>${item.nombre || ''}</td>
                     <td><span class="badge-active">Activo</span></td>
                     <td><button class="action-btn fingerprint-btn" title="Registrar Huella"><i class="fas fa-fingerprint"></i></button></td>
@@ -64,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updateData: api.updateDestino,
             deleteData: api.deleteDestino,
             renderItem: (item) => `
-                <div class="destination-item" data-id="${item.id_destino}">
+                <div class="destination-item" data-id="${item.id_destino || item.id}">
                     <div class="destination-info">
                         <i class="fas fa-map-marker-alt"></i>
                         <div>
@@ -87,17 +85,18 @@ document.addEventListener('DOMContentLoaded', function() {
             title: 'Método de Pago',
             containerId: 'payment-methods-container',
             fetchData: api.getMetodosPago,
-            getDataById: api.getMetodoById,
+            getDataById: api.getMetodosPago, // Fallback si no hay getById específico
             saveData: api.saveMetodoPago,
             updateData: api.updateMetodoPago,
-            updateStatusData: api.updateMetodoStatus,
+            updateStatusData: api.updateMetodoStatus, 
             deleteData: api.deleteMetodoPago,
             renderItem: (item) => {
-                const isChecked = (item.activo ?? 0) == 1;
+                const activoVal = item.activo ?? item.ACTIVO ?? 0;
+                const isChecked = (activoVal === 1 || activoVal === true || activoVal === 'true');
                 const statusClass = isChecked ? 'status-active' : 'status-inactive';
                 const statusText = isChecked ? 'Activo' : 'Inactivo';
                 return `
-                <div class="payment-method-item" data-id="${item.id_metodo_pago}">
+                <div class="payment-method-item" data-id="${item.id_metodo_pago || item.id}">
                     <div class="payment-info">
                         <i class="fas fa-credit-card"></i>
                         <div>
@@ -134,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let destinosCompletos = [];
 
     // ========================================
-    // FUNCIONES AUXILIARES (Modales, Toast, Sleep, etc.)
+    // FUNCIONES AUXILIARES
     // ========================================
     function openModal(modal) { if (modal) modal.classList.add('show'); }
     function closeModal(modal) { if (modal) modal.classList.remove('show'); }
@@ -145,9 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!confirmModal || !confirmModalContent) { console.error("Modal confirmación no encontrado."); resolve(false); return; }
             
             let confirmButtonClass = 'btn-primary';
-            if (confirmClass === 'btn-danger') {
-                confirmButtonClass = 'btn-danger';
-            }
+            if (confirmClass === 'btn-danger') confirmButtonClass = 'btn-danger';
 
             confirmModalContent.innerHTML = `
                 <h3>${title}</h3>
@@ -182,83 +179,69 @@ document.addEventListener('DOMContentLoaded', function() {
     function showErrorModal(title, message) { return showConfirmationModal({ title: title || 'Error', message: message || 'Ocurrió un error.', confirmText: 'Entendido', confirmClass: 'btn-primary', showCancelButton: false }); }
     function showSuccessToast(message) { const toast = document.createElement('div'); toast.className = 'success-toast'; toast.textContent = message; document.body.appendChild(toast); setTimeout(() => { toast.remove(); }, 3000); }
     function getTypeKeyFromElement(element) { if (!element) return null; if (element.closest('#vendedores-table-body')) return 'vendedor'; if (element.closest('#repartidores-table-body')) return 'repartidor'; if (element.closest('#destinations-list-container')) return 'destino'; if (element.closest('#payment-methods-container')) return 'metodo'; return null; }
-    function filterDestinos(searchTerm) { const container = document.getElementById(config.destino.containerId); if (!container) return; let itemsToRender; if (!searchTerm) { itemsToRender = destinosCompletos; } else { itemsToRender = destinosCompletos.filter(item => (item.lugar || '').toLowerCase().includes(searchTerm) || (item.direccion || '').toLowerCase().includes(searchTerm)); } if (!itemsToRender || itemsToRender.length === 0) { container.innerHTML = searchTerm ? '<div style="text-align: center; padding: 20px; color: #6b7280;">No se encontraron resultados.</div>' : config.destino.emptyStateHTML; } else { container.innerHTML = itemsToRender.map(config.destino.renderItem).join(''); } }
+    
+    function filterDestinos(searchTerm) { 
+        const container = document.getElementById(config.destino.containerId); 
+        if (!container) return; 
+        let itemsToRender; 
+        if (!searchTerm) { itemsToRender = destinosCompletos; } 
+        else { itemsToRender = destinosCompletos.filter(item => (item.lugar || '').toLowerCase().includes(searchTerm) || (item.direccion || '').toLowerCase().includes(searchTerm)); } 
+        if (!itemsToRender || itemsToRender.length === 0) { container.innerHTML = searchTerm ? '<div style="text-align: center; padding: 20px; color: #6b7280;">No se encontraron resultados.</div>' : config.destino.emptyStateHTML; } 
+        else { container.innerHTML = itemsToRender.map(config.destino.renderItem).join(''); } 
+    }
 
+    // ========================================
+    // RENDER DATA (ADAPTADO PARA JAVA)
+    // ========================================
     async function renderData(typeConfig) {
-        if (!typeConfig || !typeConfig.containerId) { console.error("Config inválida", typeConfig); return; }
-        const container = document.getElementById(typeConfig.containerId); if (!container) { return; }
+        if (!typeConfig || !typeConfig.containerId) return;
+        const container = document.getElementById(typeConfig.containerId); 
+        if (!container) return;
+
         container.innerHTML = '<p style="text-align: center;">Cargando...</p>';
         try {
-            if (typeof typeConfig.fetchData !== 'function') { throw new Error(`fetchData inválido para ${typeConfig.title}`); }
             const response = await typeConfig.fetchData();
-            if (response && response.status === 'success') {
-                const items = response.data || [];
-                if (typeConfig.title === 'Destino') { destinosCompletos = items; filterDestinos(destinoSearchInput?.value.toLowerCase() || ''); }
-                else { if (items.length === 0) { container.innerHTML = typeConfig.emptyStateHTML; } else { if(typeof typeConfig.renderItem !== 'function'){ throw new Error(`renderItem inválido para ${typeConfig.title}`);} container.innerHTML = items.map(typeConfig.renderItem).join(''); } }
-            } else { throw new Error(response?.message || 'API no devolvió éxito.'); }
-        } catch (error) { console.error(`Error cargando ${typeConfig.title}:`, error); container.innerHTML = `<p style="text-align: center; color: red;">Error.</p>`; showErrorModal('Error Carga', `No se pudo cargar ${typeConfig.title}. (${error.message})`); }
+            
+            let items = [];
+            if (Array.isArray(response)) {
+                items = response; 
+            } else if (response && (response.status === 'success' || response.success)) {
+                items = response.data || []; 
+            } else if (response && response.message) {
+                 throw new Error(response.message);
+            }
+
+            if (typeConfig.title === 'Destino') { 
+                destinosCompletos = items; 
+                filterDestinos(destinoSearchInput?.value.toLowerCase() || ''); 
+            } else { 
+                if (items.length === 0) { 
+                    container.innerHTML = typeConfig.emptyStateHTML; 
+                } else { 
+                    container.innerHTML = items.map(typeConfig.renderItem).join(''); 
+                } 
+            }
+        } catch (error) { 
+            console.error(`Error cargando ${typeConfig.title}:`, error); 
+            container.innerHTML = `<p style="text-align: center; color: red;">Error de conexión.</p>`; 
+            showErrorModal('Error Carga', `No se pudo conectar al servidor. (${error.message})`); 
+        }
     }
 
     // ========================================
-    // FUNCIONES MODAL HUELLA (Completas)
-    // ========================================
-    function openFingerprintModal(id, tipo) {
-         if (!fingerprintModal) { console.error("Modal huella no existe"); showErrorModal("Error", "Modal huella no existe."); return; }
-        fingerprintModal.innerHTML = `
-            <div class="modal-content">
-                <div class="modal-header"><h2>Registrar Huella</h2><span class="close-modal-btn">&times;</span></div>
-                <div class="modal-body">
-                    <div class="fingerprint-icon"><i class="fas fa-fingerprint"></i></div>
-                    <h3>Escanear Huella</h3><p>Coloque dedo</p>
-                    <div class="progress-steps"><div class="step" id="step-1">1</div><div class="step" id="step-2">2</div><div class="step" id="step-3">3</div></div>
-                    <p class="progress-text" id="progress-text">Esperando...</p>
-                    <div class="form-actions">
-                        <button type="button" class="btn-cancel close-modal-btn">Cancelar</button>
-                        <button type="button" class="btn-save" id="btn-retry" style="display: none;">Reintentar</button>
-                    </div>
-                </div>
-            </div>`;
-        openModal(fingerprintModal);
-        captureFingerprintSequence(id, tipo);
-    }
-    async function captureFingerprintSequence(id, tipo) {
-         const progressText = fingerprintModal?.querySelector('#progress-text'); const btnRetry = fingerprintModal?.querySelector('#btn-retry'); const iconContainer = fingerprintModal?.querySelector('.fingerprint-icon'); const btnCancel = fingerprintModal?.querySelector('.close-modal-btn');
-         if (!progressText || !btnRetry || !iconContainer || !btnCancel) { console.error("Elementos modal huella no existen"); closeModal(fingerprintModal); showErrorModal("Error", "Error inicializando modal huella."); return; }
-         btnRetry.style.display = 'none'; btnRetry.onclick = () => { iconContainer.innerHTML = '<i class="fas fa-fingerprint"></i>'; btnRetry.style.display = 'none'; btnCancel.style.display = 'inline-block'; captureFingerprintSequence(id, tipo); }; btnCancel.style.display = 'inline-block';
-         try {
-             updateFingerprintProgress(1, 'Coloque el dedo...'); await sleep(1500); console.log("Sim lectura 1...");
-             updateFingerprintProgress(2, 'Levante y coloque...'); await sleep(2000); const simulatedData = 'fingerprint_data_' + Date.now(); console.log("Sim lectura 2, datos:", simulatedData);
-             updateFingerprintProgress(3, 'Guardando...'); const response = await api.saveFingerprintData(tipo, id, simulatedData); console.log("Respuesta saveFingerprintData:", response);
-             if (response && response.status === 'success') { updateFingerprintProgress(3, '¡Registrada!'); iconContainer.innerHTML = '<i class="fas fa-check" style="color: #059669;"></i>'; btnRetry.textContent = 'Cerrar'; btnRetry.style.display = 'inline-block'; btnCancel.style.display = 'none'; btnRetry.onclick = () => closeModal(fingerprintModal); await sleep(2500); closeModal(fingerprintModal); showSuccessToast('Huella registrada.'); }
-             else { throw new Error(response?.message || 'Error al guardar'); }
-         } catch (error) { console.error('Error captura huella:', error); updateFingerprintProgress(3, 'Error'); iconContainer.innerHTML = '<i class="fas fa-times" style="color: #d90429;"></i>'; if (progressText) progressText.textContent = error.message || 'No se pudo registrar'; btnRetry.textContent = 'Reintentar'; btnRetry.style.display = 'inline-block'; btnCancel.style.display = 'inline-block'; }
-    }
-    function updateFingerprintProgress(currentStep, text) { const el = document.getElementById('progress-text'); if(el) el.textContent = text; for (let i = 1; i <= 3; i++) { const step = document.getElementById(`step-${i}`); if(step) step.classList.toggle('active', i <= currentStep); } }
-
-    // ========================================
-    // MODAL FORMULARIO (Agregar/Editar - CORREGIDO)
+    // MODAL FORMULARIO (Agregar/Editar)
     // ========================================
     function handleOpenFormModal(type, editId = null, existingData = null) {
-        const conf = config[type]; if (!conf) { console.error(`Config no encontrada: ${type}`); return; }
-        const isEditing = editId !== null; console.log(isEditing ? `Editando ${type} ID ${editId}` : `Agregando ${type}`, existingData || '');
+        const conf = config[type]; 
+        if (!conf) return;
+        const isEditing = editId !== null;
 
         const formFieldsHTML = conf.formFields.map(f => {
             const val = isEditing && existingData ? (existingData[f.id] || '') : '';
-            const placeholder = f.placeholder || '';
-            const valAttrs = (f.id === 'nombre') ? ' pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$" title="Solo letras y espacios."' : '';
-            
             return `
             <div class="form-group">
                 <label for="${f.id}">${f.label}</label>
-                <input 
-                    type="${f.type || 'text'}" 
-                    id="${f.id}" 
-                    name="${f.id}" 
-                    ${f.required ? 'required' : ''} 
-                    value="${val}" 
-                    placeholder="${placeholder}"
-                    ${valAttrs}
-                >
+                <input type="${f.type || 'text'}" id="${f.id}" name="${f.id}" ${f.required ? 'required' : ''} value="${val}" placeholder="${f.placeholder || ''}">
             </div>`;
         }).join('');
 
@@ -271,7 +254,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 <form id="generic-form" novalidate>
                     <div class="modal-body">
                         ${formFieldsHTML}
-                        
                         <div class="form-actions">
                             <button type="submit" class="btn-save">${isEditing ? 'Actualizar' : 'Guardar'}</button>
                             <button type="button" class="btn-cancel" id="form-cancel-btn">Cancelar</button> 
@@ -282,197 +264,221 @@ document.addEventListener('DOMContentLoaded', function() {
 
         openModal(formModal); 
         const form = formModal.querySelector('#generic-form'); 
-        const formCancelBtn = formModal.querySelector('#form-cancel-btn'); // Seleccionar el botón de cancelar
+        const formCancelBtn = formModal.querySelector('#form-cancel-btn');
+
+        if (formCancelBtn) formCancelBtn.addEventListener('click', () => closeModal(formModal));
+        
         if (!form) return;
 
-        // Asignar el evento de clic al botón de Cancelar
-        if (formCancelBtn) {
-            formCancelBtn.addEventListener('click', () => {
-                closeModal(formModal);
-            });
-        }
-        
         form.onsubmit = async function(e) { 
             e.preventDefault(); 
             const formData = {}; 
-            let isValid = true; 
             conf.formFields.forEach(f => { 
                 const input = form.querySelector(`#${f.id}`); 
-                if (input) { 
-                    formData[f.id] = input.value; 
-                    if (!input.checkValidity()) { 
-                        isValid = false; 
-                        console.warn(`Inválido: ${f.id}`, input.validationMessage); 
-                    } 
-                } 
+                if (input) formData[f.id] = input.value; 
             }); 
             
-            if (!isValid) { 
-                showErrorModal("Inválido", "Corrige los errores."); 
-                return; 
-            } 
-            
-            let result; 
-            const formValues = Object.values(formData); 
-            console.log("Enviando:", isEditing ? { id: editId, ...formData } : formData); 
             const submitBtn = form.querySelector('button[type="submit"]'); 
+            const formValues = Object.values(formData);
             
             try { 
                 if(submitBtn) submitBtn.disabled = true; 
+                
+                let result;
                 if (isEditing) { 
                     result = await conf.updateData(editId, ...formValues); 
                 } else { 
                     result = await conf.saveData(...formValues); 
                 } 
-                if(submitBtn) submitBtn.disabled = false; 
-                console.log("Respuesta API:", result); 
                 
-                if (result && result.status === 'success') { 
+                if(submitBtn) submitBtn.disabled = false; 
+                
+                const isSuccess = (result && result.status === 'success') || (result && result.success) || (result && !result.error && !result.message);
+
+                if (isSuccess) { 
                     await renderData(conf); 
                     closeModal(formModal); 
-                    showSuccessToast(`Se ${isEditing ? 'actualizó' : 'guardó'} ${conf.title}.`); 
+                    showSuccessToast(`Se ${isEditing ? 'actualizó' : 'guardó'} correctamente.`); 
                 } else { 
-                    showErrorModal('Error al guardar', result?.message || 'Error API.'); 
+                    showErrorModal('Error al guardar', result?.message || 'Error desconocido del servidor.'); 
                 } 
             } catch (error) { 
                 if(submitBtn) submitBtn.disabled = false; 
-                console.error('Error form submit:', error); 
-                showErrorModal('Error conexión', error.message || 'No se pudo guardar.'); 
+                showErrorModal('Error conexión', error.message); 
             } 
         };
     }
 
     // ========================================
-    // INICIALIZACIÓN Y EVENT LISTENERS PRINCIPALES
+    // MODAL HUELLA
+    // ========================================
+    function openFingerprintModal(id, tipo) {
+         if (!fingerprintModal) return;
+        fingerprintModal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header"><h2>Registrar Huella</h2><span class="close-modal-btn">&times;</span></div>
+                <div class="modal-body">
+                    <div class="fingerprint-icon"><i class="fas fa-fingerprint"></i></div>
+                    <h3>Escanear Huella</h3>
+                    <div class="progress-steps"><div class="step" id="step-1">1</div><div class="step" id="step-2">2</div><div class="step" id="step-3">3</div></div>
+                    <p class="progress-text" id="progress-text">Esperando...</p>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel close-modal-btn">Cancelar</button>
+                        <button type="button" class="btn-save" id="btn-retry" style="display: none;">Reintentar</button>
+                    </div>
+                </div>
+            </div>`;
+        openModal(fingerprintModal);
+        captureFingerprintSequence(id, tipo);
+    }
+
+    async function captureFingerprintSequence(id, tipo) {
+         const progressText = fingerprintModal?.querySelector('#progress-text'); 
+         const btnRetry = fingerprintModal?.querySelector('#btn-retry'); 
+         const iconContainer = fingerprintModal?.querySelector('.fingerprint-icon');
+         
+         try {
+             updateFingerprintProgress(1, 'Coloque el dedo...'); await sleep(1500);
+             updateFingerprintProgress(2, 'Levante y coloque...'); await sleep(2000);
+             const simulatedData = 'fingerprint_dummy_' + Date.now();
+             
+             updateFingerprintProgress(3, 'Guardando...'); 
+             const response = await api.saveFingerprintData(tipo, id, simulatedData);
+             
+             if (response && (response.status === 'success' || !response.error)) { 
+                 updateFingerprintProgress(3, '¡Registrada!'); 
+                 if(iconContainer) iconContainer.innerHTML = '<i class="fas fa-check" style="color: green;"></i>'; 
+                 setTimeout(() => closeModal(fingerprintModal), 2000);
+                 showSuccessToast('Huella registrada.'); 
+             } else { throw new Error('Error al guardar'); }
+         } catch (error) { 
+             updateFingerprintProgress(3, 'Error'); 
+             if(progressText) progressText.textContent = 'Fallo el registro';
+             if(btnRetry) btnRetry.style.display = 'inline-block';
+         }
+    }
+    function updateFingerprintProgress(currentStep, text) { 
+        const el = document.getElementById('progress-text'); if(el) el.textContent = text; 
+        for (let i = 1; i <= 3; i++) { 
+            const step = document.getElementById(`step-${i}`); 
+            if(step) step.classList.toggle('active', i <= currentStep); 
+        } 
+    }
+
+    // ========================================
+    // INITIALIZATION
     // ========================================
     console.log("Iniciando carga de datos...");
-    Object.keys(config).forEach(key => { if (config[key]) renderData(config[key]); else console.warn(`Config no existe: ${key}`); });
+    Object.keys(config).forEach(key => renderData(config[key]));
 
-    if (tabsContainer) { tabsContainer.addEventListener('click', (e) => { const tab = e.target.closest('.tab-card'); if (!tab || tab.classList.contains('active')) return; const name = tab.dataset.tab; tabsContainer.querySelectorAll('.tab-card').forEach(c => c.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); tab.classList.add('active'); const content = document.getElementById(`${name}-content`); if (content) content.classList.add('active'); }); }
-    else { console.warn("Tabs container no encontrado."); }
-
+    if (tabsContainer) { 
+        tabsContainer.addEventListener('click', (e) => { 
+            const tab = e.target.closest('.tab-card'); 
+            if (!tab || tab.classList.contains('active')) return; 
+            const name = tab.dataset.tab; 
+            tabsContainer.querySelectorAll('.tab-card').forEach(c => c.classList.remove('active')); 
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); 
+            tab.classList.add('active'); 
+            const content = document.getElementById(`${name}-content`); 
+            if (content) content.classList.add('active'); 
+        }); 
+    }
     if (destinoSearchInput) { destinoSearchInput.addEventListener('input', (e) => filterDestinos(e.target.value.toLowerCase())); }
 
     if (cardContainer) {
-        // --- Listener Principal de CLIC ---
         cardContainer.addEventListener('click', async (e) => {
             const btn = e.target.closest('button[data-action], .delete-btn, .edit-btn, .fingerprint-btn');
             if (!btn) return;
+            e.preventDefault();
 
             const action = btn.dataset.action;
             const row = btn.closest('[data-id]');
             const id = row?.dataset.id;
             const typeKey = getTypeKeyFromElement(row || btn.closest('.tab-content'));
 
-            if (action?.startsWith('add-') || btn.classList.contains('delete-btn') || btn.classList.contains('edit-btn') || btn.classList.contains('fingerprint-btn')) {
-                e.preventDefault();
-            }
-
-            // --- Acción Agregar ---
             if (action?.startsWith('add-')) {
                 handleOpenFormModal(action.replace('add-', ''));
-            }
-            // --- Acción Eliminar ---
-            else if (btn.classList.contains('delete-btn')) {
-                if (e.target !== btn && !btn.contains(e.target)) {
-                     console.log("Clic cerca delete-btn ignorado."); return;
-                }
-                if (!id || !typeKey) { console.warn("Delete: ID/Tipo N/A"); return; }
-                const confirmed = await showConfirmationModal({ title: '¿Seguro?', message: `Eliminar ${config[typeKey]?.title || 'elemento'}. No se puede deshacer.`, confirmText: 'Eliminar', confirmClass: 'btn-danger' });
+            } else if (btn.classList.contains('delete-btn')) {
+                if (!id) return;
+                const confirmed = await showConfirmationModal({ title: '¿Seguro?', message: `Eliminar elemento.`, confirmClass: 'btn-danger' });
                 if (confirmed) { 
-                    console.log(`Eliminando ${typeKey} ID ${id}`); 
                     const result = await config[typeKey].deleteData(id); 
-                    if (result && result.status === 'success') { await renderData(config[typeKey]); showSuccessToast('Eliminado.'); } 
-                    else { showErrorModal('Error al eliminar', result?.message || 'Error API.'); } 
+                    if (result && (result.status === 'success' || !result.error)) { 
+                        await renderData(config[typeKey]); 
+                        showSuccessToast('Eliminado.'); 
+                    } else { showErrorModal('Error', 'No se pudo eliminar.'); } 
                 }
-            }
-            // --- Acción Editar ---
-            else if (btn.classList.contains('edit-btn')) {
-                if (!id || !typeKey) { console.warn("Edit: ID/Tipo N/A"); return; }
-                const result = await config[typeKey].getDataById(id);
-                if (result && result.status === 'success' && result.data) { handleOpenFormModal(typeKey, id, result.data); }
-                else { showErrorModal('Error cargando', result?.message || 'No se pudo obtener.'); }
-            }
-            // --- Acción Huella ---
-            else if (btn.classList.contains('fingerprint-btn')) {
-                 if (!id || !typeKey || (typeKey !== 'vendedor' && typeKey !== 'repartidor')) { console.warn("FP: ID/Tipo N/A o inválido"); showErrorModal("Error", "No aplicable."); return; }
-                openFingerprintModal(id, tipo);
+            } else if (btn.classList.contains('edit-btn')) {
+                if (!id) return;
+                let data = null;
+                try {
+                    const result = await config[typeKey].getDataById(id);
+                    if(result && (result.id || result.data)) data = result.data || result;
+                } catch(e) { console.log("Fetch by ID falló, buscando en local..."); }
+                
+                if (!data && typeKey === 'destino') data = destinosCompletos.find(d => (d.id_destino || d.id) == id);
+
+                if (data) handleOpenFormModal(typeKey, id, data);
+                else showErrorModal('Error', 'No se pudieron cargar los datos.');
+            } else if (btn.classList.contains('fingerprint-btn')) {
+                openFingerprintModal(id, typeKey);
             }
         });
-
-        // --- Listener de CAMBIO (para el Toggle) ---
+        
+        // Listener toggle (Lógica Restaurada)
         cardContainer.addEventListener('change', async (e) => {
             const toggle = e.target.closest('.toggle-switch input[type="checkbox"]');
             if (!toggle) return;
-            e.stopPropagation();
-
+            
             const itemElement = toggle.closest('.payment-method-item');
-            const id = itemElement?.dataset.id;
-            const typeKey = getTypeKeyFromElement(itemElement);
+            if (!itemElement) return;
+
+            const id = itemElement.dataset.id;
+            const typeKey = 'metodo'; 
             
-            if (!id || typeKey !== 'metodo') { console.warn("Toggle: ID/Tipo N/A o inválido", {id, typeKey}); toggle.checked = !toggle.checked; return; }
-            
-            const newStatus = toggle.checked; const typeConfig = config[typeKey];
-            console.log(`Cambiando estado ${typeKey} ${id} a ${newStatus ? 'activo' : 'inactivo'}`);
+            if (!id) return;
+
+            const newStatus = toggle.checked;
             
             try {
-                const result = await typeConfig.updateStatusData(id, newStatus);
-                if (result && result.status === 'success') {
-                    const statusText = itemElement.querySelector('.payment-info span');
-                    if (statusText) { statusText.textContent = newStatus ? 'Activo' : 'Inactivo'; statusText.className = newStatus ? 'status-active' : 'status-inactive'; }
-                } else { toggle.checked = !newStatus; showErrorModal('Error actualizando', result?.message || 'Error API.'); }
-            } catch (error) { console.error('Error toggle status:', error); toggle.checked = !newStatus; showErrorModal('Error conexión', error.message || 'No se pudo actualizar.'); }
-        });
-    } else { console.warn("Card container no encontrado."); }
+                // Usamos la función específica updateMetodoStatus si existe, o un update normal
+                const typeConfig = config[typeKey];
+                const updateFn = typeConfig.updateStatusData || typeConfig.updateData;
+                
+                // Si es updateStatusData enviamos (id, status), si es updateData enviamos objeto
+                let result;
+                if (typeConfig.updateStatusData) {
+                    result = await typeConfig.updateStatusData(id, newStatus);
+                } else {
+                    // Fallback
+                    result = await typeConfig.updateData(id, { activo: newStatus ? 1 : 0 });
+                }
 
-    // ========================================
-    // CIERRE DE MODALES (Global)
-    // ========================================
+                if (result && (result.status === 'success' || !result.error)) {
+                    // Actualizar UI
+                    const statusText = itemElement.querySelector('.payment-info span');
+                    if (statusText) {
+                        statusText.textContent = newStatus ? 'Activo' : 'Inactivo';
+                        statusText.className = newStatus ? 'status-active' : 'status-inactive';
+                    }
+                    showSuccessToast('Estado actualizado.');
+                } else {
+                    throw new Error(result.message || 'Error API');
+                }
+            } catch (error) {
+                console.error("Error toggle:", error);
+                toggle.checked = !newStatus; // Revertir cambio visual
+                showErrorModal('Error', 'No se pudo actualizar el estado.');
+            }
+        });
+    }
+
+    // Cerrar modales global
     document.addEventListener('click', (e) => { 
         if (e.target.closest('.close-modal-btn')) { 
-            const m = e.target.closest('.modal'); 
-            if(m) closeModal(m); 
-        } else if (e.target.classList.contains('modal') && e.target.classList.contains('show')) { 
-            // Si el clic es en el overlay de un modal, y NO es el modal de confirmación (que tiene su propia lógica de cierre con botones)
-            // Y no es el botón de cancelar dentro de los modales de formulario
-            if (e.target.id === 'confirm-modal' && !document.getElementById('confirm-cancel-btn')) return;
+            const m = document.querySelector('.modal.show'); if(m) closeModal(m);
+        } else if (e.target.classList.contains('modal')) { 
             closeModal(e.target); 
         } 
     });
-    
-    document.addEventListener('keydown', (e) => { 
-        if (e.key === 'Escape') { 
-            const openModals = document.querySelectorAll('.modal.show'); 
-            if (openModals.length > 0) { 
-                closeModal(openModals[openModals.length - 1]); 
-            } 
-        } 
-    });
-
-    // ========================================
-    // MANEJO DEL LOGOUT PARA AGREGARINFO
-    // ========================================
-    const btnLogout = document.getElementById('logout-btn');
-    if (btnLogout) {
-        console.log("Configurando logout para agregarInfo...");
-        btnLogout.addEventListener('click', function(e) {
-            e.preventDefault();
-            Swal.fire({
-                title: '¿Estás seguro?',
-                text: "Estás a punto de cerrar la sesión.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d90429',
-                cancelButtonColor: '#6e7881',
-                confirmButtonText: 'Sí, cerrar sesión',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    localStorage.removeItem('currentUser');
-                    localStorage.removeItem('currentUserRole');
-                    window.location.href = '../html/index.html';
-                }
-            });
-        });
-    }
 });

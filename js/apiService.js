@@ -1,184 +1,116 @@
-// ========================================
-// SERVICIO DE API - Integrado con api.php
-// ========================================
+const BASE_URL = 'http://98.87.202.154:7001';
 
-// Asegúrate que esta ruta sea correcta para llegar a tu carpeta api desde la raíz del servidor
-const BASE_URL = '/kung-fu/api';
-
-// Función genérica para llamar a la API
-async function callApi(action, method = 'GET', body = null, isGetById = false) {
-    let url = `${BASE_URL}/api.php?action=${action}`;
+async function request(endpoint, method = 'GET', body = null) {
+    const url = `${BASE_URL}${endpoint}`;
+    
     const options = {
         method,
-        headers: {} // Inicializar headers
+        headers: { 'Content-Type': 'application/json' }
     };
 
-    // Si es GET y hay 'body' (que debería ser el ID), añadirlo a la URL
-    if (method === 'GET' && isGetById && body && body.id) {
-        url += `&id=${body.id}`;
-    }
-    // Si es POST (o PUT, DELETE) y hay cuerpo, añadirlo y configurar header
-    else if (body && (method === 'POST' || method === 'PUT' || method === 'DELETE')) {
-        options.body = JSON.stringify(body);
-        options.headers['Content-Type'] = 'application/json';
-    }
-
-    // console.log(`Calling API: ${method} ${url}`, body ? `with body: ${JSON.stringify(body)}` : ''); // Log para depurar
+    if (body) options.body = JSON.stringify(body);
 
     try {
+        
         const response = await fetch(url, options);
-        const text = await response.text(); // Leer como texto primero
-        // console.log(`Response for ${action}:`, text); // Log para depurar
 
         if (!response.ok) {
-             // Intentar parsear el error si es JSON, si no, usar el texto
-             try {
-                 const errorJson = JSON.parse(text);
-                 throw new Error(errorJson.message || `Error HTTP ${response.status}`);
-             } catch (e) {
-                 throw new Error(`Error HTTP ${response.status}: ${text || response.statusText}`);
-             }
+            const errorText = await response.text();
+            throw new Error(`Error ${response.status}: ${errorText}`);
         }
 
-        // Intentar parsear como JSON (si la respuesta está vacía, devolver success)
+        const text = await response.text();
+        if (!text) return { status: 'success' }; 
+
         try {
-             if (text.trim() === '') {
-                 // Considerar respuesta vacía como éxito si el status HTTP fue OK
-                 return { status: 'success', message: 'Operación completada (respuesta vacía)', data: null };
-             }
             return JSON.parse(text);
         } catch (e) {
-            console.error(`Error parsing JSON for ${action}:`, text);
-            throw new Error("Respuesta inválida del servidor (no es JSON)");
+            return { status: 'success', message: text };
         }
     } catch (error) {
-        console.error(`Falló la llamada a la API [${action}]:`, error);
-        // Devolver un objeto de error estándar para que el frontend lo maneje
-        return { status: 'error', message: error.message || 'Error de conexión desconocido' };
+        console.error(`❌ Error API [${endpoint}]:`, error);
+        throw error;
     }
 }
 
+export const api = {
 
-// Definición del objeto api (usando la función genérica)
-const api = {
+    // ==========================================
+    // 1. VENDEDORES    
+    // ==========================================
+    getVendedores: () => request('/vendedor'),
+    getVendedorById: (id) => request(`/vendedor/${id}`),
+    saveVendedor: (nombre) => request('/vendedor', 'POST', { nombre }),
+    updateVendedor: (id, nombre) => request(`/vendedor/${id}`, 'PUT', { nombre }),
+    deleteVendedor: (id) => request(`/vendedor/${id}`, 'DELETE'),
 
-    // ==================
-    // VENDEDORES
-    // ==================
-    getVendedores: () => callApi('get_vendedores'),
-    getVendedorById: (id) => callApi('get_vendedor_by_id', 'GET', { id }, true)
-        .then(result => { // Adaptar respuesta para el formulario
-            if (result.status === 'success' && result.data) {
-                result.data = { nombre: result.data.nombre };
-            }
-            return result;
-        }),
-    saveVendedor: (nombre) => callApi('create_vendedor', 'POST', { nombre }),
-    updateVendedor: (id, nombre) => callApi('update_vendedor', 'POST', { id, nombre }),
-    deleteVendedor: (id) => callApi('delete_vendedor', 'POST', { id }),
+    // ==========================================
+    // 2. REPARTIDORES 
+    // ==========================================
+    getRepartidores: () => request('/repartidor'),
+    getRepartidorById: (id) => request(`/repartidor/${id}`),
+    saveRepartidor: (nombre) => request('/repartidor', 'POST', { nombre }),
+    updateRepartidor: (id, nombre) => request(`/repartidor/${id}`, 'PUT', { nombre }),
+    deleteRepartidor: (id) => request(`/repartidor/${id}`, 'DELETE'),
 
-    // ==================
-    // REPARTIDORES
-    // ==================
-    getRepartidores: () => callApi('get_repartidores'),
-    getRepartidorById: (id) => callApi('get_repartidor_by_id', 'GET', { id }, true)
-        .then(result => { // Adaptar respuesta
-            if (result.status === 'success' && result.data) {
-                result.data = { nombre: result.data.nombre };
-            }
-            return result;
-        }),
-    saveRepartidor: (nombre) => callApi('create_repartidor', 'POST', { nombre }),
-    updateRepartidor: (id, nombre) => callApi('update_repartidor', 'POST', { id, nombre }),
-    deleteRepartidor: (id) => callApi('delete_repartidor', 'POST', { id }),
+    // ==========================================
+    // 3. DESTINOS 
+    // ==========================================
+    getDestinos: () => request('/destinos'),
+    getDestinoById: (id) => request(`/destinos/${id}`),
+    saveDestino: (lugar, direccion) => request('/destinos', 'POST', { lugar, direccion }),
+    updateDestino: (id, lugar, direccion) => request(`/destinos/${id}`, 'PUT', { lugar, direccion }),
+    deleteDestino: (id) => request(`/destinos/${id}`, 'DELETE'),
 
-    // ==================
-    // DESTINOS
-    // ==================
-    getDestinos: () => callApi('get_destinos'),
-    getDestinoById: (id) => callApi('get_destino_by_id', 'GET', { id }, true)
-        .then(result => { // Adaptar respuesta
-            if (result.status === 'success' && result.data) {
-                result.data = { lugar: result.data.lugar, direccion: result.data.direccion };
-            }
-            return result;
-        }),
-    saveDestino: (lugar, direccion) => callApi('create_destino', 'POST', { lugar, direccion }),
-    updateDestino: (id, lugar, direccion) => callApi('update_destino', 'POST', { id, lugar, direccion }),
-    deleteDestino: (id) => callApi('delete_destino', 'POST', { id }),
-
-    // ==================
-    // MÉTODOS DE PAGO
-    // ==================
-    getMetodosPago: () => callApi('get_metodos_pago'),
+    // ==========================================
+    // 4. MÉTODOS DE PAGO 
+    // ==========================================
+    getMetodosPago: () => request('/metodo_pago'),
     
-    getMetodosPagoActivos: () => callApi('get_metodos_pago')
-        .then(result => {
-            // ✅ Filtrar solo métodos ACTIVOS (activo = 1)
-            if (result.status === 'success' && Array.isArray(result.data)) {
-                result.data = result.data.filter(m => {
-                    const activo = m.activo ?? m.ACTIVO ?? 0;
-                    return parseInt(activo) === 1;
-                });
-            }
-            return result;
-        }),
+    // Función auxiliar para filtrar activos en el frontend
+    getMetodosPagoActivos: async () => {
+        const data = await request('/metodo_pago');
+        const lista = Array.isArray(data) ? data : (data.data || []);
+        return lista.filter(m => {
+            const activo = m.activo ?? m.ACTIVO ?? 0; // Adaptarse a mayúsculas/minúsculas
+            return parseInt(activo) === 1 || activo === true;
+        });
+    },
 
-    saveMetodoPago: (nombre) => callApi('create_metodo_pago', 'POST', { nombre }),
-    updateMetodoPago: (id, nombre) => callApi('update_metodo_pago', 'POST', { id, nombre }),
-    updateMetodoStatus: (id, activo) => callApi('update_metodo_status', 'POST', { id, activo: activo ? 1 : 0 }),
-    deleteMetodoPago: (id) => callApi('delete_metodo_pago', 'POST', { id }),
+    saveMetodoPago: (nombre) => request('/metodo_pago', 'POST', { nombre }),
+    updateMetodoPago: (id, nombre) => request(`/metodo_pago/${id}`, 'PUT', { nombre }),
+    // Si no tienes ruta específica de estatus, usamos el update normal (asumiendo que envías todo el objeto)
+    updateMetodoStatus: (id, activo) => request(`/metodo_pago/${id}`, 'PUT', { activo: activo ? 1 : 0 }),
+    deleteMetodoPago: (id) => request(`/metodo_pago/${id}`, 'DELETE'),
 
-    // ==================
-    // HUELLAS
-    // ==================
-    saveFingerprintData: (tipo_persona, id_persona, datos_huella) => callApi('save_fingerprint', 'POST', { tipo_persona, id_persona, datos_huella }),
-    verifyFingerprintData: (tipo_persona, datos_huella) => callApi('verify_fingerprint', 'POST', { tipo_persona, datos_huella }),
 
-    // ==================
-    // AUTENTICACIÓN Y OTRAS FUNCIONES
-    // ==================
-    login: (usuario_login, contraseña) => callApi('login', 'POST', { usuario_login, contraseña }),
-    getAsistenciasDelDia: () => callApi('get_asistencia_del_dia'),
-    updateAsistencia: (asistenciaData) => callApi('update_asistencia', 'POST', asistenciaData),
-    getRepartos: () => callApi('get_repartos'),
-    saveReparto: (repartoData) => callApi('create_reparto', 'POST', repartoData),
-    finalizarReparto: (repartoId) => callApi('finalizar_reparto', 'POST', { id: repartoId }),
-    getConfiguracion: () => callApi('get_configuracion'),
-    saveConfiguracion: (configData) => callApi('save_configuracion', 'POST', configData),
-    calcularPagos: (params) => callApi('calcular_pagos', 'POST', params),
-    saveReporte: (reporteData) => callApi('save_reporte', 'POST', reporteData),
+    // ==========================================
+    // 5. ASISTENCIAS 
+    // ==========================================
+    getAsistencias: () => request('/asistencias'),
+    saveAsistencia: (data) => request('/asistencias', 'POST', data),
+    
+    // ==========================================
+    // 6. REPARTOS 
+    // ==========================================
+    getRepartos: () => request('/reparto'),
+    saveReparto: (data) => request('/reparto', 'POST', data),
+    updateReparto: (id, data) => request(`/reparto/${id}`, 'PUT', data),
 
-    // ==================
-    // MÉTODO GENÉRICO PARA DASHBOARD/REPORTES
-    // ==================
-    callApi: (action, method = 'POST', data = null) => {
-        let url = `${BASE_URL}/api.php?action=${action}`;
-        const options = {
-            method: method,
-            headers: { 'Content-Type': 'application/json' }
-        };
+    // ==========================================
+    // 7. OTRAS FUNCIONES
+    // ==========================================
+    getConfiguracion: () => request('/configuracion'),
+    
+    // ==========================================
+    // 8. CONFIGURACIÓN Y PAGOS (Faltaban estas)
+    // ==========================================
+    getConfiguracion: () => request('/configuracion'), // GET para leer sueldos
+    saveConfiguracion: (data) => request('/configuracion', 'POST', data), // POST para guardar
+    
+    // ⚠️ ATENCIÓN: Estas rutas deben existir en tu Java (ver Paso 3)
+    calcularPagos: (params) => request('/pago/calcular', 'POST', params),
+    saveReporte: (data) => request('/pago/reporte', 'POST', data),
 
-        if (data && (method === 'POST' || method === 'PUT')) {
-            options.body = JSON.stringify(data);
-        }
-
-        return fetch(url, options)
-            .then(response => response.text())
-            .then(text => {
-                try {
-                    return JSON.parse(text);
-                } catch (e) {
-                    console.error('Error parsing JSON:', text);
-                    return { status: 'error', message: 'Respuesta inválida del servidor' };
-                }
-            })
-            .catch(error => {
-                console.error('API Error:', error);
-                return { status: 'error', message: error.message };
-            });
-    }
-
-}; // Fin del objeto 'api'
-
-export { api };
+    login: (usuario, password) => request('/empleados/login', 'POST', { usuario, password }), 
+};
